@@ -23,6 +23,64 @@ def process_data(data):
 
     return villager_enchantments, enchantment_costs
 
+def generate_villager_report(villager_enchantments):
+    villager_data = []
+
+    for villager, enchantments in villager_enchantments.items():
+        for enchantment, cost in enchantments:
+            villager_data.append((villager, enchantment, cost))
+
+    # Create a DataFrame and sort by Villager ID
+    villager_df = pd.DataFrame(villager_data, columns=["Villager_ID", "Enchantment", "Cost"])
+    villager_df.sort_values(by=["Villager_ID", "Cost"], inplace=True)
+
+    # Save to CSV
+    villager_df.to_csv("villager_enchantments_by_id.csv", index=False)
+
+    # Print report
+    print("\n" + "="*50)
+    print("   VILLAGER ENCHANTMENTS SORTED BY ID")
+    print("="*50)
+    print(villager_df.to_string(index=False))
+
+    print("\nResults saved to: villager_enchantments_by_id.csv")
+
+def assign_villagers_to_locations(villager_enchantments, disposable_villagers):
+    # Remove disposable villagers from consideration
+    active_villagers = {v: e for v, e in villager_enchantments.items() if v not in disposable_villagers}
+
+    # Step 1: Sort villagers by their highest-priority enchantment (A-Z)
+    sorted_villagers = sorted(
+        active_villagers.items(),
+        key=lambda x: sorted(x[1], key=lambda e: e[0])[0][0] if x[1] else "",
+    )
+
+    # Step 2: Assign villagers to locations, keeping all their enchantments together
+    assigned_locations = []
+    location_id = 1
+
+    for villager, enchantments in sorted_villagers:
+        # Sort this villager's enchantments alphabetically
+        enchantments.sort(key=lambda x: x[0])
+        for enchantment, cost in enchantments:
+            assigned_locations.append((location_id, villager, enchantment, cost))
+        location_id += 1  # Move to next location only after placing a full villager
+
+    # Step 3: Convert to DataFrame and save
+    location_df = pd.DataFrame(
+        assigned_locations, columns=["Location_ID", "Villager_ID", "Enchantment", "Cost"]
+    )
+    location_df.to_csv("villager_locations.csv", index=False)
+
+    # Print report
+    print("\n" + "=" * 60)
+    print("   VILLAGER LOCATIONS (ASSIGNED & SORTED)")
+    print("=" * 60)
+    print(location_df.to_string(index=False))
+
+    print("\nResults saved to: villager_locations.csv")
+
+
 # Optimize for fewest villagers while covering all enchantments
 def optimize_villagers(villager_enchantments, enchantment_costs, cost_threshold):
     sorted_villagers = sorted(villager_enchantments.items(), key=lambda x: len(x[1]), reverse=True)
@@ -115,6 +173,12 @@ def main():
     missing_enchantments = find_missing_enchantments(enchantment_costs, optimal_set)
 
     save_and_display_results(optimal_set, disposable_villagers, missing_enchantments, best_costs)
+
+    # Generate and display the villager ID report
+    generate_villager_report(villager_enchantments)
+
+    # Generate and display the assigned locations report
+    assign_villagers_to_locations(villager_enchantments, disposable_villagers)
 
 # Run the script
 if __name__ == "__main__":
