@@ -95,7 +95,7 @@ def optimize_villagers(villager_enchantments, enchantment_costs, cost_threshold)
                 selected_villagers[villager] = True
             else:
                 previous_villager, previous_cost = optimal_set[enchantment]
-                if cost < previous_cost and (previous_cost - cost) > cost_threshold:
+                if cost < previous_cost:
                     optimal_set[enchantment] = (villager, cost)
                     selected_villagers[villager] = True
                     selected_villagers[previous_villager] = True
