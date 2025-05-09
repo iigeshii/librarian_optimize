@@ -1,0 +1,120 @@
+{
+    "Aqua Affinity I": {
+        "1": 1
+    },
+    "Bane of Arthropods V": {
+        "2": 8
+    },
+    "Blast Protection IV": {
+        "3": 18
+    },
+    "Breach IV": {
+        "4": 20
+    },
+    "Channeling I": {
+        "5": 1
+    },
+    "Density V": {
+        "6": 3
+    },
+    "Depth Strider III": {
+        "7": 1
+    },
+    "Efficiency V": {
+        "8": 2
+    },
+    "Feather Falling IV": {
+        "9": 1
+    },
+    "Fire Aspect II": {
+        "10": 1
+    },
+    "Fire Protection IV": {
+        "6": 1
+    },
+    "Flame I": {
+        "6": 1,
+        "11": 1
+    },
+    "Fortune III": {
+        "12": 1
+    },
+    "Frost Walker II": {
+        "13": 13
+    },
+    "Impaling V": {
+        "14": 4
+    },
+    "Infinity I": {
+        "5": 1
+    },
+    "Knockback II": {
+        "8": 1,
+        "15": 1
+    },
+    "Looting III": {
+        "16": 1
+    },
+    "Loyalty III": {
+        "17": 1
+    },
+    "Luck of the Sea III": {
+        "18": 1,
+        "15": 1
+    },
+    "Lure III": {
+        "19": 1
+    },
+    "Mending I": {
+        "20": 1
+    },
+    "Multishot I": {
+        "1": 1,
+        "15": 1,
+        "9": 1
+    },
+    "Piercing IV": {
+        "21": 32
+    },
+    "Power V": {
+        "13": 1
+    },
+    "Projectile Protection IV": {
+        "22": 1
+    },
+    "Protection IV": {
+        "23": 32
+    },
+    "Punch II": {
+        "9": 3
+    },
+    "Quick Charge III": {
+        "1": 13,
+        "19": 1
+    },
+    "Respiration III": {
+        "5": 3,
+        "12": 1
+    },
+    "Riptide III": {
+        "18": 1
+    },
+    "Sharpness V": {
+        "12": 17,
+        "11": 1,
+        "19": 15
+    },
+    "Silk Touch I": {
+        "20": 1,
+        "14": 1
+    },
+    "Smite V": {
+        "24": 32
+    },
+    "Thorns III": {
+        "15": 3
+    },
+    "Unbreaking III": {
+        "25": 9
+    }
+}
