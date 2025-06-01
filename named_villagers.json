@@ -1,0 +1,148 @@
+{
+  "Alden": {
+    "enchantments": {
+      "Breach IV": 20,
+      "Multishot I": 1
+    }
+  },
+  "Bram": {
+    "enchantments": {
+      "Respiration III": 3,
+      "Infinity I": 1,
+      "Channeling I": 1,
+      "Bane of Arthropods IV": 32
+    }
+  },
+  "Cedric": {
+    "enchantments": {
+      "Fire Protection IV": 1,
+      "Density V": 3,
+      "Flame I": 1
+    }
+  },
+  "Dorian": {
+    "enchantments": {
+      "Power V": 1,
+      "Frost Walker II": 13,
+      "Efficiency IV": 1,
+      "Projectile Protection I": 1
+    }
+  },
+  "Elias": {
+    "enchantments": {
+      "Piercing IV": 32,
+      "Curse of Binding I": 1
+    }
+  },
+  "Finn": {
+    "enchantments": {
+      "Mending I": 1,
+      "Silk Touch I": 1,
+      "Sharpness II": 1,
+      "Density IV": 1
+    }
+  },
+  "Gideon": {
+    "enchantments": {
+      "Protection IV": 32
+    }
+  },
+  "Hugo": {
+    "enchantments": {
+      "Riptide III": 1,
+      "Loyalty II": 1
+    }
+  },
+  "Ira": {
+    "enchantments": {
+      "Unbreaking III": 9
+    }
+  },
+  "Jasper": {
+    "enchantments": {
+      "Loyalty III": 1,
+      "Impaling IV": 21
+    }
+  },
+  "Kellan": {
+    "enchantments": {
+      "Depth Strider III": 1,
+      "Thorns II": 1
+    }
+  },
+  "Leon": {
+    "enchantments": {
+      "Impaling V": 4,
+      "Silk Touch I": 1,
+      "Knockback I": 1
+    }
+  },
+  "Milo": {
+    "enchantments": {
+      "Efficiency V": 2,
+      "Knockback II": 1,
+      "Depth Strider II": 1,
+      "Blast Protection II": 1
+    }
+  },
+  "Nolan": {
+    "enchantments": {
+      "Looting III": 1,
+      "Piercing I": 1
+    }
+  },
+  "Orin": {
+    "enchantments": {
+      "Projectile Protection IV": 1,
+      "Curse of Binding I": 1
+    }
+  },
+  "Percy": {
+    "enchantments": {
+      "Lure III": 1,
+      "Quick Charge III": 1,
+      "Sharpness V": 15
+    }
+  },
+  "Quinlan": {
+    "enchantments": {
+      "Multishot I": 1,
+      "Luck of the Sea III": 1,
+      "Knockback II": 1,
+      "Thorns III": 3
+    }
+  },
+  "Rowan": {
+    "enchantments": {
+      "Smite V": 32
+    }
+  },
+  "Silas": {
+    "enchantments": {
+      "Fortune III": 1,
+      "Respiration III": 1,
+      "Sharpness V": 17
+    }
+  },
+  "Thorne": {
+    "enchantments": {
+      "Sharpness V": 1,
+      "Lure II": 2,
+      "Protection II": 1,
+      "Flame I": 1
+    }
+  },
+  "Ulysses": {
+    "enchantments": {
+      "Fire Aspect II": 1,
+      "Quick Charge II": 2
+    }
+  },
+  "Zev": {
+    "enchantments": {
+      "Feather Falling IV": 1,
+      "Luck of the Sea II": 1,
+      "Punch II": 3
+    }
+  }
+}
