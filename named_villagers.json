@@ -145,6 +145,27 @@
       "Respiration I": 1
     }
   },
+  "Wesley": {
+    "enchantments": {
+      "Bane of Arthropods V": 1,
+      "Infinity I": 1,
+      "Quick Charge I": 1,
+      "Riptide II": 1
+    }
+  },
+  "Xander": {
+    "enchantments": {
+      "Curse of Vanishing I": 1,
+      "Luck of the Sea II": 1
+    }
+  },
+  "Yosef": {
+    "enchantments": {
+      "Blast Protection III": 20,
+      "Blast Protection IV": 22,
+      "Fire Protection I": 1
+    }
+  },
   "Zev": {
     "enchantments": {
       "Feather Falling IV": 1,
