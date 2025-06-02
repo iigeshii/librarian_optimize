@@ -7,39 +7,39 @@
   },
   "Bram": {
     "enchantments": {
-      "Respiration III": 3,
-      "Infinity I": 1,
+      "Bane of Arthropods IV": 32,
       "Channeling I": 1,
-      "Bane of Arthropods IV": 32
+      "Infinity I": 1,
+      "Respiration III": 3
     }
   },
   "Cedric": {
     "enchantments": {
-      "Fire Protection IV": 1,
       "Density V": 3,
+      "Fire Protection IV": 1,
       "Flame I": 1
     }
   },
   "Dorian": {
     "enchantments": {
-      "Power V": 1,
-      "Frost Walker II": 13,
       "Efficiency IV": 1,
+      "Frost Walker II": 13,
+      "Power V": 1,
       "Projectile Protection I": 1
     }
   },
   "Elias": {
     "enchantments": {
-      "Piercing IV": 32,
-      "Curse of Binding I": 1
+      "Curse of Binding I": 1,
+      "Piercing IV": 32
     }
   },
   "Finn": {
     "enchantments": {
+      "Density IV": 1,
       "Mending I": 1,
-      "Silk Touch I": 1,
       "Sharpness II": 1,
-      "Density IV": 1
+      "Silk Touch I": 1
     }
   },
   "Gideon": {
@@ -49,8 +49,8 @@
   },
   "Hugo": {
     "enchantments": {
-      "Riptide III": 1,
-      "Loyalty II": 1
+      "Loyalty II": 1,
+      "Riptide III": 1
     }
   },
   "Ira": {
@@ -60,8 +60,8 @@
   },
   "Jasper": {
     "enchantments": {
-      "Loyalty III": 1,
-      "Impaling IV": 21
+      "Impaling IV": 21,
+      "Loyalty III": 1
     }
   },
   "Kellan": {
@@ -73,16 +73,16 @@
   "Leon": {
     "enchantments": {
       "Impaling V": 4,
-      "Silk Touch I": 1,
-      "Knockback I": 1
+      "Knockback I": 1,
+      "Silk Touch I": 1
     }
   },
   "Milo": {
     "enchantments": {
-      "Efficiency V": 2,
-      "Knockback II": 1,
+      "Blast Protection II": 1,
       "Depth Strider II": 1,
-      "Blast Protection II": 1
+      "Efficiency V": 2,
+      "Knockback II": 1
     }
   },
   "Nolan": {
@@ -93,8 +93,8 @@
   },
   "Orin": {
     "enchantments": {
-      "Projectile Protection IV": 1,
-      "Curse of Binding I": 1
+      "Curse of Binding I": 1,
+      "Projectile Protection IV": 1
     }
   },
   "Percy": {
@@ -106,9 +106,9 @@
   },
   "Quinlan": {
     "enchantments": {
-      "Multishot I": 1,
-      "Luck of the Sea III": 1,
       "Knockback II": 1,
+      "Luck of the Sea III": 1,
+      "Multishot I": 1,
       "Thorns III": 3
     }
   },
@@ -126,16 +126,23 @@
   },
   "Thorne": {
     "enchantments": {
-      "Sharpness V": 1,
+      "Flame I": 1,
       "Lure II": 2,
       "Protection II": 1,
-      "Flame I": 1
+      "Sharpness V": 1
     }
   },
   "Ulysses": {
     "enchantments": {
       "Fire Aspect II": 1,
       "Quick Charge II": 2
+    }
+  },
+  "Vance": {
+    "enchantments": {
+      "Aqua Affinity": 1,
+      "Projectile Protection III": 1,
+      "Respiration I": 1
     }
   },
   "Zev": {
