@@ -1,61 +1,100 @@
+
 import json
+from pathlib import Path
 import argparse
 from collections import defaultdict
 
-def load_json_file(filename):
-    try:
-        with open(filename, "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        print(f"❌ Error: File not found — {filename}")
-        return {}
-    except json.JSONDecodeError:
-        print(f"❌ Error: Could not parse JSON — {filename}")
-        return {}
+def load_data():
+    with open("named_villagers.json") as f:
+        villagers = json.load(f)
+    with open("enchantments.json") as f:
+        master = json.load(f)
+    return villagers, set(master["villager_enchantments"])
 
-def find_enchantment_coverage(master_file, villagers_file):
-    master_data = load_json_file(master_file)
-    villagers = load_json_file(villagers_file)
+def get_villager_enchantments(villagers):
+    all_enchants = set()
+    for data in villagers.values():
+        all_enchants.update(data["enchantments"].keys())
+    return all_enchants
 
-    master_enchants = set(e.strip() for e in master_data.get("villager_enchantments", []))
-    enchantment_map = defaultdict(list)  # enchantment -> list of "Villager (Cost)"
+def optimize_min_villagers(villagers, required):
+    remaining = set(required)
+    optimized = {}
 
-    for villager_name, data in villagers.items():
-        for ench, cost in data.get("enchantments", {}).items():
-            ench_clean = ench.strip()
-            if ench_clean in master_enchants:
-                enchantment_map[ench_clean].append(f"{villager_name} ({cost})")
+    while remaining:
+        best_villager = None
+        best_contribution = set()
 
-    found_enchants = set(enchantment_map.keys())
-    missing = sorted(master_enchants - found_enchants)
-    covered = sorted(master_enchants & found_enchants)
+        for name, data in villagers.items():
+            enchants = set(data["enchantments"].keys())
+            contribution = enchants & remaining
+            if len(contribution) > len(best_contribution):
+                best_villager = name
+                best_contribution = contribution
 
-    print("📜 Missing enchantments from villagers:")
-    if missing:
-        for enchantment in missing:
-            print(f"- {enchantment}")
-    else:
-        print("✅ All enchantments are covered by your villagers.")
+        if not best_villager:
+            break
 
-    print("\n📚 Covered enchantments (max level only):")
-    for enchantment in covered:
-        villager_list = ", ".join(sorted(enchantment_map[enchantment]))
-        print(f"- {enchantment}: {villager_list}")
+        optimized[best_villager] = {
+            "enchantments": {
+                e: villagers[best_villager]["enchantments"][e]
+                for e in best_contribution
+            }
+        }
+        remaining -= best_contribution
 
+    return optimized
+
+def print_all_enchantments(villagers, required):
+    enchant_map = defaultdict(list)
+    for name, data in villagers.items():
+        for enchant, price in data["enchantments"].items():
+            if enchant in required:
+                enchant_map[enchant].append(f"{name} ({price})")
+
+    print("\n📘 Enchantment coverage:")
+    for enchant in sorted(required):
+        if enchant in enchant_map:
+            holders = ", ".join(sorted(enchant_map[enchant]))
+            print(f"- {enchant}: {holders}")
+        else:
+            print(f"- {enchant}: ❌ None")
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Villager Optimization: Show missing and covered enchantments (max level only)."
-    )
-    parser.add_argument(
-        "--master", default="enchantments.json", help="Path to enchantments master list JSON"
-    )
-    parser.add_argument(
-        "--villagers", default="named_villagers.json", help="Path to named villagers JSON"
-    )
-
+    parser = argparse.ArgumentParser(description="Villager Enchantment Optimization")
+    parser.add_argument("--optimize", action="store_true", help="Minimize number of villagers")
     args = parser.parse_args()
-    find_enchantment_coverage(args.master, args.villagers)
+
+    villagers, required = load_data()
+
+    if args.optimize:
+        optimized = optimize_min_villagers(villagers, required)
+        all_names = set(villagers)
+        kept = set(optimized)
+        removed = sorted(all_names - kept)
+
+        print("\n🧠 Optimized villager set (minimum number of villagers to cover all enchantments):")
+        for name in sorted(optimized):
+            enchants = optimized[name]["enchantments"]
+            ench_str = ", ".join(f"{e} ({c})" for e, c in enchants.items())
+            print(f"- {name}: {ench_str}")
+
+        print("\n🗑 Removed villagers:")
+        for name in removed:
+            enchants = villagers[name]["enchantments"]
+            ench_str = ", ".join(f"{e} ({c})" for e, c in enchants.items())
+            print(f"- {name}: {ench_str}")
+    else:
+        villager_enchants = get_villager_enchantments(villagers)
+        missing = sorted(required - villager_enchants)
+        if missing:
+            print("📜 Missing enchantments from villagers:")
+            for m in missing:
+                print(f"- {m}")
+        else:
+            print("✅ All enchantments are covered by the villagers!")
+
+        print_all_enchantments(villagers, required)
 
 if __name__ == "__main__":
     main()
