@@ -25,13 +25,13 @@
       "Compass": 14
     }
   },
-  "Dorian": {
+  "Desmond": {
     "enchantments": {
-      "Efficiency IV": 1,
-      "Frost Walker II": 13,
-      "Power V": 1,
-      "Projectile Protection I": 1,
-      "Nametag": 1
+      "Blast Protection IV": 8,
+      "Frost Walker II": 23,
+      "Power V": 22,
+      "Glass": 1,
+      "Nametag": 14
     }
   },
   "Elias": {
@@ -152,21 +152,12 @@
       "Nametag": 1
     }
   },
-  "Silas": {
+  "Sterling": {
     "enchantments": {
-      "Fortune III": 1,
-      "Respiration III": 1,
-      "Sharpness V": 17,
-      "Compass": 1
-    }
-  },
-  "Thorne": {
-    "enchantments": {
-      "Flame I": 1,
-      "Lure II": 2,
-      "Protection II": 1,
-      "Sharpness V": 1,
-      "Nametag": 1
+      "Fortune III": 13,
+      "Knockback I": 1,
+      "Bookshelf": 3,
+      "Clock": 1
     }
   },
   "Ulysses": {
@@ -202,14 +193,6 @@
       "Compass": 1
     }
   },
-  "Yosef": {
-    "enchantments": {
-      "Blast Protection III": 20,
-      "Blast Protection IV": 22,
-      "Fire Protection I": 1,
-      "Clock": 1
-    }
-  },
   "Zev": {
     "enchantments": {
       "Feather Falling IV": 1,
@@ -217,26 +200,6 @@
       "Punch II": 3,
       "Compass": 1
     }
-  },
-  "John Doe 1": {
-    "enchantments": {
-      "Blast Protection IV": 8,
-      "Frost Walker II": 23,
-      "Power V": 22
-    }
-  },
-  "John Doe 2": {
-    "enchantments": {
-      "Fire Protection IV": 1,
-      "Sharpness IV": 1,
-      "Thorns III": 1
-    }
-  },
-  "John Doe 3": {
-    "enchantments": {
-      "Punch II": 1,
-      "Flame I": 1,
-      "Blast Protection III": 8
-    }
   }
+
 }
