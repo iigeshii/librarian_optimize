@@ -3,19 +3,43 @@ import json
 from pathlib import Path
 import argparse
 from collections import defaultdict
+import re
 
 def load_data():
     with open("named_villagers.json") as f:
         villagers = json.load(f)
     with open("enchantments.json") as f:
         master = json.load(f)
-    return villagers, set(master["villager_enchantments"])
+    return villagers, set(master["villager_enchantments"]), set(master["non_enchantments"])
+
 
 def get_villager_enchantments(villagers):
     all_enchants = set()
     for data in villagers.values():
         all_enchants.update(data["enchantments"].keys())
     return all_enchants
+
+def get_non_enchantment_codes(name, villagers, non_enchantments):
+    hints = {
+        "Glass": "Glass",
+        "Nametag": "Nametag",
+        "Bookshelf": "Bookshelf",
+        "Lantern": "Lantern",
+        "Compass": "Compass",
+        "Clock": "Clock",
+    }
+
+    def abbreviation(item):
+        return hints.get(item, item[:2].upper() if len(item.split()) == 1 else "".join(word[0] for word in item.split()).upper())
+
+    codes = [
+        abbreviation(ench)
+        for ench in villagers[name]["enchantments"]
+        if ench in non_enchantments
+    ]
+
+    return f"({', '.join(codes)})" if codes else ""
+
 
 def optimize_min_villagers(villagers, required):
     remaining = set(required)
@@ -61,12 +85,25 @@ def print_all_enchantments(villagers, required):
         else:
             print(f"{i+1:>2}. {enchant:<{max_name_len}} : ❌ None")
 
+def get_enchantment_index(enchantment, required_list):
+    """
+    Returns the 1-based index of the enchantment/item in the sorted global list.
+    """
+    sorted_required = sorted(required_list)
+    try:
+        return sorted_required.index(enchantment) + 1
+    except ValueError:
+        return None  # or raise an error if preferred
+
+def strip_roman_numerals(name):
+    return re.sub(r" [IVXLCDM]+$", "", name)
+
 def main():
     parser = argparse.ArgumentParser(description="Villager Enchantment Optimization")
     parser.add_argument("--optimize", action="store_true", help="Minimize number of villagers")
     args = parser.parse_args()
 
-    villagers, required = load_data()
+    villagers, required, non_enchantments = load_data()
 
     if args.optimize:
         optimized = optimize_min_villagers(villagers, required)
@@ -82,10 +119,75 @@ def main():
             print(f"{i+1:>2}. {name:<{max_name_len}} : {ench_str}")
 
         print("\n🗑 Removed villagers:")
-        for i, name in enumerate(removed):
+        for name in removed:
             enchants = villagers[name]["enchantments"]
             ench_str = ", ".join(f"{e} ({c})" for e, c in enchants.items())
-            print(f"{i+1:>2}. {name:<{max_name_len}} : {ench_str}")
+            print(f"- {name}: {ench_str}")
+
+        print("\n📐 Layout:")
+        # Step 1: Sort each villager's enchantments alphabetically
+        villager_sorted_enchants = {
+            name: sorted(optimized[name]["enchantments"].items())
+            for name in optimized
+        }
+
+        # Step 2: Sort villagers by the first enchantment name in their list
+        sorted_villagers = sorted(
+            villager_sorted_enchants.items(),
+            key=lambda item: item[1][0][0] if item[1] else ""
+        )
+
+        # Step 3: Print out the sorted layout
+        for i, (name, ench_list) in enumerate(sorted_villagers, start=1):
+            ench_str = " ".join(
+                f"{get_enchantment_index(e, required)}. {strip_roman_numerals(e)}"
+                for e, _ in ench_list
+            )
+            nec = get_non_enchantment_codes(name, villagers, non_enchantments)
+            print(f"{i:>2}. {name:{max_name_len}}: {ench_str}{nec}")
+
+
+        # create a dict for each enchantment.
+        required_dict = {item: "" for item in sorted(required)}
+
+        # Step 2: Populate only the first enchantment per villager
+        for villager_name, data in optimized.items():
+            # Sort enchantments alphabetically
+            sorted_enchants = sorted(data["enchantments"])
+            # Build the full display string with indexes
+            enchant_str = "\n".join(
+                f"§b{get_enchantment_index(e, required)}. {strip_roman_numerals(e)}"
+                for e in sorted_enchants)
+            codes = get_non_enchantment_codes(villager_name, villagers, non_enchantments)
+            if codes:
+                enchant_str += f"\n§e{codes}"
+
+            # Only assign this string to the first enchantment in the sorted list
+            if sorted_enchants:
+                required_dict[sorted_enchants[0]] = enchant_str
+
+        # Step 3: Fill in blank entries with "See X. First Enchantment"
+        for enchant in required_dict:
+            if required_dict[enchant] == "":
+                # Find which villager has this enchantment
+                for villager_name, data in optimized.items():
+                    ench_list = sorted(data["enchantments"])
+                    if enchant in ench_list:
+                        # Get the first enchantment alphabetically for this villager
+                        first_enchant = ench_list[0]
+                        see_index = get_enchantment_index(first_enchant, required)
+                        this_index = get_enchantment_index(enchant, required)
+                        # Format: X. Enchant (See Y. First Enchant)
+                        required_dict[enchant] = f"§b{this_index}. {strip_roman_numerals(enchant)} §7§o(See {see_index}. {strip_roman_numerals(first_enchant)})"
+                        break
+
+        print("\n📋 Sign Layout:")
+        for line in required_dict.values():
+            print("-------")
+            for segment in line.split("\n"):
+                print(segment)
+
+
     else:
         villager_enchants = get_villager_enchantments(villagers)
         missing = sorted(required - villager_enchants)

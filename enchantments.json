@@ -37,7 +37,9 @@
     "Silk Touch I",
     "Smite V",
     "Thorns III",
-    "Unbreaking III",
+    "Unbreaking III"
+  ],
+  "non_enchantments": [
     "Bookshelf",
     "Lantern",
     "Glass",
