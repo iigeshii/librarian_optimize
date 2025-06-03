@@ -53,12 +53,13 @@ def print_all_enchantments(villagers, required):
                 enchant_map[enchant].append(f"{name} ({price})")
 
     print("\n📘 Enchantment coverage:")
-    for enchant in sorted(required):
+    max_name_len = max(len(name) for name in sorted(required))
+    for i, enchant in enumerate(sorted(required)):
         if enchant in enchant_map:
             holders = ", ".join(sorted(enchant_map[enchant]))
-            print(f"- {enchant}: {holders}")
+            print(f"{i+1:>2}. {enchant:<{max_name_len}} : {holders}")
         else:
-            print(f"- {enchant}: ❌ None")
+            print(f"{i+1:>2}. {enchant:<{max_name_len}} : ❌ None")
 
 def main():
     parser = argparse.ArgumentParser(description="Villager Enchantment Optimization")
@@ -74,16 +75,17 @@ def main():
         removed = sorted(all_names - kept)
 
         print("\n🧠 Optimized villager set (minimum number of villagers to cover all enchantments):")
-        for name in sorted(optimized):
+        max_name_len = max(len(name) for name in villagers)
+        for i, name in enumerate(sorted(optimized)):
             enchants = optimized[name]["enchantments"]
             ench_str = ", ".join(f"{e} ({c})" for e, c in enchants.items())
-            print(f"- {name}: {ench_str}")
+            print(f"{i+1:>2}. {name:<{max_name_len}} : {ench_str}")
 
         print("\n🗑 Removed villagers:")
-        for name in removed:
+        for i, name in enumerate(removed):
             enchants = villagers[name]["enchantments"]
             ench_str = ", ".join(f"{e} ({c})" for e, c in enchants.items())
-            print(f"- {name}: {ench_str}")
+            print(f"{i+1:>2}. {name:<{max_name_len}} : {ench_str}")
     else:
         villager_enchants = get_villager_enchantments(villagers)
         missing = sorted(required - villager_enchants)
