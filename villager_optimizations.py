@@ -182,10 +182,16 @@ def main():
                         break
 
         print("\n📋 Sign Layout:")
-        for line in required_dict.values():
-            print("-------")
+        for enchant, line in required_dict.items():
+            # Find the villager assigned to this enchantment
+            villager_name = next(
+                (name for name, data in optimized.items() if enchant in data["enchantments"]),
+                None
+            )
+            print(f"------- {villager_name} -------")
             for segment in line.split("\n"):
                 print(segment)
+                
 
 
     else:
