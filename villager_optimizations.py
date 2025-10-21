@@ -1,14 +1,26 @@
-
 import json
 from pathlib import Path
 import argparse
 from collections import defaultdict
 import re
 
-def load_data():
-    with open("named_villagers.json") as f:
+# ----------------------------------------------------------
+# Load villager and enchantment data
+# named_villagers.json is provided as the required argument
+# enchantments.json is expected in the same directory as the script
+# ----------------------------------------------------------
+def load_data(villagers_file):
+    villagers_path = Path(villagers_file)
+    enchants_path = Path(__file__).parent / "enchantments.json"
+
+    if not villagers_path.exists():
+        raise FileNotFoundError(f"Missing file: {villagers_path}")
+    if not enchants_path.exists():
+        raise FileNotFoundError(f"Missing file: {enchants_path}")
+
+    with open(villagers_path) as f:
         villagers = json.load(f)
-    with open("enchantments.json") as f:
+    with open(enchants_path) as f:
         master = json.load(f)
     return villagers, set(master["villager_enchantments"]), set(master["non_enchantments"])
 
@@ -18,6 +30,7 @@ def get_villager_enchantments(villagers):
     for data in villagers.values():
         all_enchants.update(data["enchantments"].keys())
     return all_enchants
+
 
 def get_non_enchantment_codes(name, villagers, non_enchantments):
     hints = {
@@ -69,6 +82,7 @@ def optimize_min_villagers(villagers, required):
 
     return optimized
 
+
 def print_all_enchantments(villagers, required):
     enchant_map = defaultdict(list)
     for name, data in villagers.items():
@@ -85,6 +99,7 @@ def print_all_enchantments(villagers, required):
         else:
             print(f"{i+1:>2}. {enchant:<{max_name_len}} : ❌ None")
 
+
 def get_enchantment_index(enchantment, required_list):
     """
     Returns the 1-based index of the enchantment/item in the sorted global list.
@@ -95,15 +110,26 @@ def get_enchantment_index(enchantment, required_list):
     except ValueError:
         return None  # or raise an error if preferred
 
+
 def strip_roman_numerals(name):
     return re.sub(r" [IVXLCDM]+$", "", name)
 
+
 def main():
     parser = argparse.ArgumentParser(description="Villager Enchantment Optimization")
-    parser.add_argument("--optimize", action="store_true", help="Minimize number of villagers")
+    parser.add_argument(
+        "villagers_file",
+        help="Path to named_villagers.json file"
+    )
+    parser.add_argument(
+        "--optimize",
+        action="store_true",
+        help="Minimize number of villagers"
+    )
     args = parser.parse_args()
 
-    villagers, required, non_enchantments = load_data()
+    # Load data: named_villagers.json from argument, enchantments.json from script dir
+    villagers, required, non_enchantments = load_data(args.villagers_file)
 
     if args.optimize:
         optimized = optimize_min_villagers(villagers, required)
@@ -145,7 +171,6 @@ def main():
             )
             nec = get_non_enchantment_codes(name, villagers, non_enchantments)
             print(f"{i:>2}. {name:{max_name_len}}: {ench_str}{nec}")
-
 
         # create a dict for each enchantment.
         required_dict = {item: "" for item in sorted(required)}
@@ -191,8 +216,6 @@ def main():
             print(f"------- {villager_name} -------")
             for segment in line.split("\n"):
                 print(segment)
-                
-
 
     else:
         villager_enchants = get_villager_enchantments(villagers)
@@ -205,6 +228,7 @@ def main():
             print("✅ All enchantments are covered by the villagers!")
 
         print_all_enchantments(villagers, required)
+
 
 if __name__ == "__main__":
     main()
