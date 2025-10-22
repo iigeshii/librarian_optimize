@@ -1,205 +1,115 @@
 {
-  "Alden": {
+  "1": {
     "enchantments": {
-      "Breach IV": 20,
-      "Multishot I": 1,
+      "Impaling V": 27,
+      "Fire Protection IV": 51,
+      "Glass": 1
+    }
+  },
+  "2": {
+    "enchantments": {
+      "Aqua Affinity": 5,
+      "Silk Touch": 15
+    }
+  },
+  "3": {
+    "enchantments": {
+      "Protection IV": 25,
+      "Silk Touch": 6,
+      "Glass": 1
+    }
+  },
+  "4": {
+    "enchantments": {
+      "Mending": 10
+    }
+  },
+  "5": {
+    "enchantments": {
+      "Efficiency V": 21,
       "Lantern": 1,
-      "Glass": 1,
-      "Nametag": 14
+      "Glass": 1
     }
   },
-  "Bram": {
+  "6": {
     "enchantments": {
-      "Bane of Arthropods IV": 32,
-      "Channeling I": 1,
-      "Infinity I": 1,
-      "Respiration III": 3,
-      "Nametag": 14
+      "Silk Touch": 5,
+      "Glass": 1
     }
   },
-  "Cedric": {
+  "7": {
     "enchantments": {
-      "Density V": 3,
-      "Fire Protection IV": 1,
-      "Flame I": 1,
-      "Compass": 1
-    }
-  },
-  "Desmond": {
-    "enchantments": {
-      "Blast Protection IV": 8,
-      "Frost Walker II": 23,
-      "Power V": 22,
-      "Glass": 1,
-      "Nametag": 14
-    }
-  },
-  "Elias": {
-    "enchantments": {
-      "Curse of Binding I": 1,
-      "Piercing IV": 32, 
-      "Glass": 1,
-      "Clock": 1
-    }
-  },
-  "Finn": {
-    "enchantments": {
-      "Density IV": 1,
-      "Mending I": 1,
-      "Sharpness II": 1,
-      "Silk Touch I": 1, 
-      "Nametag": 14
-    }
-  },
-  "Gideon": {
-    "enchantments": {
-      "Protection IV": 32, 
+      "Looting III": 7,
       "Lantern": 1,
-      "Glass": 1,
-      "Compass": 1
+      "Glass": 1
     }
   },
-  "Hugo": {
+  "8": {
     "enchantments": {
-      "Loyalty II": 1,
-      "Riptide III": 1,
-      "Lantern": 1,
-      "Compass": 1
+      "Unbreaking III": 15,
+      "Glass": 1
     }
   },
-  "Ira": {
+  "9": {
     "enchantments": {
-      "Unbreaking III": 9,
-      "Lantern": 1,
-      "Glass": 1, 
-      "Compass": 1,
-      "Nametag": 14
+      "Sharpness V": 25,
+      "Lantern": 1
     }
   },
-  "Jasper": {
+  "10": {
     "enchantments": {
-      "Impaling IV": 21,
-      "Loyalty III": 1, 
-      "Lantern": 1,
-      "Clock": 1
+      "Respiration III": 8,
+      "Lantern": 1
     }
   },
-  "Kellan": {
-    "enchantments": {
-      "Depth Strider III": 1,
-      "Thorns II": 1,
-      "Lantern": 1,
-      "Compass": 1
-    }
-  },
-  "Leon": {
-    "enchantments": {
-      "Impaling V": 4,
-      "Knockback I": 1,
-      "Silk Touch I": 1,
-      "Lantern": 1, 
-      "Nametag": 14
-    }
-  },
-  "Milo": {
-    "enchantments": {
-      "Blast Protection II": 1,
-      "Depth Strider II": 1,
-      "Efficiency V": 2,
-      "Knockback II": 1,
-      "Nametag": 14
-    }
-  },
-  "Nolan": {
-    "enchantments": {
-      "Looting III": 1,
-      "Piercing I": 1,
-      "Lantern": 1,
-      "Compass": 1
-    }
-  },
-  "Orin": {
-    "enchantments": {
-      "Curse of Binding I": 1,
-      "Projectile Protection IV": 1, 
-      "Lantern": 1,
-      "Clock": 1
-    }
-  },
-  "Percy": {
-    "enchantments": {
-      "Lure III": 1,
-      "Quick Charge III": 1,
-      "Sharpness V": 15,
-      "Clock": 1
-    }
-  },
-  "Quinlan": {
-    "enchantments": {
-      "Knockback II": 1,
-      "Luck of the Sea III": 1,
-      "Multishot I": 1,
-      "Thorns III": 3,
-      "Nametag": 14
-    }
-  },
-  "Rowan": {
-    "enchantments": {
-      "Smite V": 32, 
-      "Lantern": 1,
-      "Glass": 1,
-      "Compass": 1,
-      "Nametag": 1
-    }
-  },
-  "Sterling": {
+  "11": {
     "enchantments": {
       "Fortune III": 13,
-      "Knockback I": 1,
+      "Lantern": 1
+    }
+  },
+  "12 Cured": {
+    "enchantments": {
+      "Projectile Protection IV": 7,
+      "Lantern": 1,
+      "Glass": 1
+    }
+  },
+  "13 Cured": {
+    "enchantments": {
+      "Blast Protection IV": 2,
+      "Sharpness V": 19,
+      "Glass": 1,
+      "Compass": 1
+    }
+  },
+  "14 Cured": {
+    "enchantments": {
+      "Channeling": 1,
+      "Protection IV": 12,
+      "Clock": 1
+    }
+  },
+  "15 Cured": {
+    "enchantments": {
       "Bookshelf": 3,
-      "Clock": 1
-    }
-  },
-  "Ulysses": {
-    "enchantments": {
-      "Fire Aspect II": 1,
-      "Quick Charge II": 2,
-      "Glass": 1,
-      "Clock": 1
-    }
-  },
-  "Vance": {
-    "enchantments": {
+      "Lantern": 1,
       "Aqua Affinity": 1,
-      "Projectile Protection III": 1,
-      "Respiration I": 1,
-      "Clock": 1
+      "Compass": 1
     }
   },
-  "Wesley": {
+  "16 Cured": {
     "enchantments": {
-      "Bane of Arthropods V": 1,
-      "Infinity I": 1,
-      "Quick Charge I": 1,
-      "Riptide II": 1,
-      "Nametag": 14
+      "Piercing IV": 15,
+      "Compass": 1
     }
   },
-  "Xander": {
+  "17 Cured": {
     "enchantments": {
-      "Curse of Vanishing I": 1,
-      "Luck of the Sea II": 1,
+      "Power V": 39,
+      "Thorns III": 2,
       "Glass": 1,
-      "Compass": 1
-    }
-  },
-  "Zev": {
-    "enchantments": {
-      "Feather Falling IV": 1,
-      "Luck of the Sea II": 1,
-      "Punch II": 3,
-      "Compass": 1
+      "Clock": 1
     }
   }
-
 }
