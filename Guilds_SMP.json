@@ -8,15 +8,17 @@
   },
   "2": {
     "enchantments": {
-      "Aqua Affinity": 5,
-      "Silk Touch": 15
+      "Fire Protection IV": 21,
+      "Silk Touch": 1,
+      "Glass": 1,
+      "Clock": 1
     }
   },
   "3": {
     "enchantments": {
-      "Protection IV": 25,
-      "Silk Touch": 6,
-      "Glass": 1
+      "Feather Falling IV": 7,
+      "Aqua Affinity": 1,
+      "Clock": 1
     }
   },
   "4": {
@@ -31,10 +33,12 @@
       "Glass": 1
     }
   },
-  "6": {
+  "6 CURED": {
     "enchantments": {
-      "Silk Touch": 5,
-      "Glass": 1
+      "Flame": 1,
+      "Lantern": 1,
+      "Glass": 1,
+      "Depth Strider III": 14
     }
   },
   "7": {
@@ -50,10 +54,12 @@
       "Glass": 1
     }
   },
-  "9": {
+  "9 CURED": {
     "enchantments": {
-      "Sharpness V": 25,
-      "Lantern": 1
+      "Power V": 19,
+      "Fire Protection IV": 14,
+      "Glass": 1,
+      "Clock": 1
     }
   },
   "10": {
@@ -68,14 +74,15 @@
       "Lantern": 1
     }
   },
-  "12 Cured": {
+    "12 CURED": {
     "enchantments": {
-      "Projectile Protection IV": 7,
-      "Lantern": 1,
-      "Glass": 1
+      "Bookshelf": 1,
+      "Flame": 1,
+      "Glass": 1,
+      "Compass": 1
     }
   },
-  "13 Cured": {
+  "13 CURED": {
     "enchantments": {
       "Blast Protection IV": 2,
       "Sharpness V": 19,
@@ -83,14 +90,14 @@
       "Compass": 1
     }
   },
-  "14 Cured": {
+  "14 CURED": {
     "enchantments": {
       "Channeling": 1,
       "Protection IV": 12,
       "Clock": 1
     }
   },
-  "15 Cured": {
+  "15 CURED": {
     "enchantments": {
       "Bookshelf": 3,
       "Lantern": 1,
@@ -98,18 +105,45 @@
       "Compass": 1
     }
   },
-  "16 Cured": {
+  "16 CURED": {
     "enchantments": {
       "Piercing IV": 15,
       "Compass": 1
     }
   },
-  "17 Cured": {
+  "17 CURED": {
     "enchantments": {
       "Power V": 39,
       "Thorns III": 2,
       "Glass": 1,
       "Clock": 1
+    }
+  },
+  "18 CURED": {
+    "enchantments": {
+      "Infinity": 1,
+      "Projectile Protection IV": 4
+    }
+  },
+  "19 CURED": {
+    "enchantments": {
+      "Luck of the Sea III": 11,
+      "Flame": 1,
+      "Compass": 1
+    }
+  },
+  "20 CURED": {
+    "enchantments": {
+      "Bookshelf": 1,
+      "Multishot": 1,
+      "Glass": 1
+    }
+  },
+  "21 CURED": {
+    "enchantments": {
+      "Knockback II": 1,
+      "Punch II": 4,
+      "Multishot": 1
     }
   }
 }
