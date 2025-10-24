@@ -5,12 +5,27 @@ from collections import defaultdict
 import re
 import sys
 
-# ----------------------------------------------------------
-# Load villager and enchantment data
-# named_villagers.json is provided as the required argument
-# enchantments.json is expected in the same directory as the script
-# ----------------------------------------------------------
 def load_data(villagers_file):
+    """
+    Load villagers (from `villagers_file`) and the master enchantment catalog
+    (from `enchantments.json` in the script directory).
+
+    EXPECTED JSON FORMAT (no legacy support):
+    {
+      "villager_enchantments": [
+        { "name": "Mending", "priority": 1 },
+        { "name": "Unbreaking III", "priority": 1 },
+        ...
+      ],
+      "non_enchantments": ["Bookshelf", "Lantern", ...]
+    }
+
+    Returns:
+      villagers: dict
+      villager_enchants: set[str]            # set of enchantment names
+      non_enchants: set[str]                 # set of non-enchantment item names
+      enchant_priority: dict[str, int]       # name -> priority (1,2,3)
+    """
     villagers_path = Path(villagers_file)
     enchants_path = Path(__file__).parent / "enchantments.json"
 
@@ -19,30 +34,62 @@ def load_data(villagers_file):
     if not enchants_path.exists():
         raise FileNotFoundError(f"Missing file: {enchants_path}")
 
-    with open(villagers_path) as f:
+    with open(villagers_path, "r", encoding="utf-8") as f:
         villagers = json.load(f)
-    with open(enchants_path) as f:
+    with open(enchants_path, "r", encoding="utf-8") as f:
         master = json.load(f)
 
-    villager_enchants = set(master["villager_enchantments"])
-    non_enchants = set(master["non_enchantments"])
-    all_master_enchants = villager_enchants | non_enchants
+    # --- Parse villager_enchantments (required, list of objects)
+    raw = master.get("villager_enchantments")
+    if not isinstance(raw, list) or not raw:
+        raise ValueError("enchantments.json must have a non-empty 'villager_enchantments' list.")
 
-    # ✅ Validation: make sure no villager has invalid enchantments
+    enchant_priority = {}
+    names_seen = set()
+    for i, entry in enumerate(raw, start=1):
+        if not isinstance(entry, dict):
+            raise ValueError(f"'villager_enchantments[{i}]' must be an object with 'name' and 'priority'.")
+        name = entry.get("name")
+        prio = entry.get("priority")
+
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError(f"'villager_enchantments[{i}].name' must be a non-empty string.")
+        if name in names_seen:
+            raise ValueError(f"Duplicate enchantment name in 'villager_enchantments': '{name}'.")
+        if prio not in (1, 2, 3):
+            raise ValueError(f"'villager_enchantments[{i}].priority' must be 1, 2, or 3 (got {prio!r}).")
+
+        names_seen.add(name)
+        enchant_priority[name] = prio
+
+    villager_enchants = set(names_seen)
+
+    # --- Parse non_enchantments (required, list of strings)
+    non_raw = master.get("non_enchantments")
+    if not isinstance(non_raw, list) or not all(isinstance(x, str) for x in non_raw):
+        raise ValueError("'non_enchantments' must be a list of strings.")
+    non_enchants = set(non_raw)
+
+    # --- Validate villagers' data against master lists
+    all_master = villager_enchants | non_enchants
     invalid_entries = []
-    for name, data in villagers.items():
-        for enchant in data.get("enchantments", {}):
-            if enchant not in all_master_enchants:
-                invalid_entries.append((name, enchant))
+    for v_name, data in villagers.items():
+        ench_dict = data.get("enchantments", {})
+        if not isinstance(ench_dict, dict):
+            raise ValueError(f"Villager '{v_name}' has invalid 'enchantments' (expected object).")
+        for ench_name in ench_dict.keys():
+            if ench_name not in all_master:
+                invalid_entries.append((v_name, ench_name))
 
     if invalid_entries:
         print("❌ Error: Found unrecognized enchantments in villager data:")
-        for name, enchant in invalid_entries:
-            print(f"   - {name}: '{enchant}' not found in master list")
+        for v_name, ench in invalid_entries:
+            print(f"   - {v_name}: '{ench}' not found in master list")
         print("\n💡 Please fix the villager JSON or update enchantments.json before running again.")
         sys.exit(1)
 
-    return villagers, villager_enchants, non_enchants
+    return villagers, villager_enchants, non_enchants, enchant_priority
+
 
 
 def get_villager_enchantments(villagers):
@@ -262,7 +309,7 @@ def main():
     args = parser.parse_args()
 
     # Load data: named_villagers.json from argument, enchantments.json from script dir
-    villagers, required, non_enchantments = load_data(args.villagers_file)
+    villagers, required, non_enchantments, enchant_priority = load_data(args.villagers_file)
 
     if args.optimize:
         if args.method == "min-villagers":
