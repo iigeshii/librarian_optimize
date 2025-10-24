@@ -1,149 +1,170 @@
 {
   "1": {
+    "cured": false,
     "enchantments": {
-      "Impaling V": 27,
-      "Fire Protection IV": 51,
-      "Glass": 1
+      "Impaling V": { "pre": 27, "post": "X" },
+      "Fire Protection IV": { "pre": 51, "post": "X" },
+      "Glass": { "pre": 1, "post": "X" }
     }
   },
   "2": {
+    "cured": true,
     "enchantments": {
-      "Fire Protection IV": 21,
-      "Silk Touch": 1,
-      "Glass": 1,
-      "Clock": 1
+      "Fire Protection IV": { "pre": 46, "post": 21 },
+      "Silk Touch": { "pre": 13, "post": 1 },
+      "Glass": { "pre": 1, "post": 1 },
+      "Clock": { "pre": 5, "post": 1 }
     }
   },
   "3": {
+    "cured": true,
     "enchantments": {
-      "Feather Falling IV": 7,
-      "Aqua Affinity": 1,
-      "Clock": 1
+      "Feather Falling IV": { "pre": 32, "post": 7 },
+      "Aqua Affinity": { "pre": 13, "post": 1 },
+      "Clock": { "pre": 1, "post": "X" }
     }
   },
   "4": {
+    "cured": false,
     "enchantments": {
-      "Mending": 10
+      "Mending": { "pre": 10, "post": "X" }
     }
   },
   "5": {
+    "cured": false,
     "enchantments": {
-      "Efficiency V": 21,
-      "Lantern": 1,
-      "Glass": 1
+      "Efficiency V": { "pre": 21, "post": "X" },
+      "Lantern": { "pre": 1, "post": "X" },
+      "Glass": { "pre": 1, "post": "X" }
     }
   },
-  "6 CURED": {
+  "6": {
+    "cured": true,
     "enchantments": {
-      "Flame": 1,
-      "Lantern": 1,
-      "Glass": 1,
-      "Depth Strider III": 14
+      "Flame": { "pre": 19, "post": 1 },
+      "Lantern": { "pre": "X", "post": 1 },
+      "Glass": { "pre": "X", "post": 1 },
+      "Depth Strider III": { "pre": 39, "post": 14 }
     }
   },
   "7": {
+    "cured": false,
     "enchantments": {
-      "Looting III": 7,
-      "Lantern": 1,
-      "Glass": 1
+      "Looting III": { "pre": 12, "post": "X" },
+      "Lantern": { "pre": 1, "post": "X" },
+      "Glass": { "pre": 1, "post": "X" }
     }
   },
   "8": {
+    "cured": false,
     "enchantments": {
-      "Unbreaking III": 15,
-      "Glass": 1
+      "Unbreaking III": { "pre": 28, "post": "X" },
+      "Glass": { "pre": 1, "post": "X" }
     }
   },
-  "9 CURED": {
+  "9": {
+    "cured": true,
     "enchantments": {
-      "Power V": 19,
-      "Fire Protection IV": 14,
-      "Glass": 1,
-      "Clock": 1
+      "Power V": { "pre": 44, "post": 19 },
+      "Fire Protection IV": { "pre": 39, "post": 14 },
+      "Glass": { "pre": "X", "post": 1 },
+      "Clock": { "pre": "X", "post": 1 }
     }
   },
   "10": {
+    "cured": false,
     "enchantments": {
-      "Respiration III": 8,
-      "Lantern": 1
+      "Respiration III": { "pre": 13, "post": "X" },
+      "Lantern": { "pre": 1, "post": "X" }
     }
   },
   "11": {
+    "cured": false,
     "enchantments": {
-      "Fortune III": 13,
-      "Lantern": 1
+      "Fortune III": { "pre": 18, "post": "X" },
+      "Lantern": { "pre": 1, "post": "X" }
     }
   },
-    "12 CURED": {
+  "12": {
+    "cured": true,
     "enchantments": {
-      "Bookshelf": 1,
-      "Flame": 1,
-      "Glass": 1,
-      "Compass": 1
+      "Bookshelf": { "pre": "X", "post": 1 },
+      "Flame": { "pre": 12, "post": 1 },
+      "Glass": { "pre": "X", "post": 1 },
+      "Compass": { "pre": "X", "post": 1 }
     }
   },
-  "13 CURED": {
+  "13": {
+    "cured": true,
     "enchantments": {
-      "Blast Protection IV": 2,
-      "Sharpness V": 19,
-      "Glass": 1,
-      "Compass": 1
+      "Blast Protection IV": { "pre": 27, "post": 2 },
+      "Sharpness V": { "pre": 44, "post": 19 },
+      "Glass": { "pre": "X", "post": 1 },
+      "Compass": { "pre": "X", "post": 1 }
     }
   },
-  "14 CURED": {
+  "14": {
+    "cured": true,
     "enchantments": {
-      "Channeling": 1,
-      "Protection IV": 12,
-      "Clock": 1
+      "Channeling": { "pre": 18, "post": 1 },
+      "Protection IV": { "pre": 37, "post": 12 },
+      "Clock": { "pre": "X", "post": 1 }
     }
   },
-  "15 CURED": {
+  "15": {
+    "cured": true,
     "enchantments": {
-      "Bookshelf": 3,
-      "Lantern": 1,
-      "Aqua Affinity": 1,
-      "Compass": 1
+      "Bookshelf": { "pre": "X", "post": 3 },
+      "Lantern": { "pre": "X", "post": 1 },
+      "Aqua Affinity": { "pre": 13, "post": 1 },
+      "Compass": { "pre": "X", "post": 1 }
     }
   },
-  "16 CURED": {
+  "16": {
+    "cured": true,
     "enchantments": {
-      "Piercing IV": 15,
-      "Compass": 1
+      "Piercing IV": { "pre": 48, "post": 15 },
+      "Compass": { "pre": 4, "post": 1 }
     }
   },
-  "17 CURED": {
+  "17": {
+    "cured": true,
     "enchantments": {
-      "Power V": 39,
-      "Thorns III": 2,
-      "Glass": 1,
-      "Clock": 1
+      "Power V": { "pre": 64, "post": 39 },
+      "Thorns III": { "pre": 27, "post": 2 },
+      "Glass": { "pre": "X", "post": 1 },
+      "Clock": { "pre": "X", "post": 1 }
     }
   },
-  "18 CURED": {
+  "18": {
+    "cured": true,
     "enchantments": {
-      "Infinity": 1,
-      "Projectile Protection IV": 4
+      "Infinity": { "pre": 19, "post": 1 },
+      "Projectile Protection IV": { "pre": 29, "post": 4 }
     }
   },
-  "19 CURED": {
+  "19": {
+    "cured": true,
     "enchantments": {
-      "Luck of the Sea III": 11,
-      "Flame": 1,
-      "Compass": 1
+      "Luck of the Sea III": { "pre": 36, "post": 11 },
+      "Flame": { "pre": 9, "post": 1 },
+      "Compass": { "pre": "X", "post": 1 }
     }
   },
-  "20 CURED": {
+  "20": {
+    "cured": true,
     "enchantments": {
-      "Bookshelf": 1,
-      "Multishot": 1,
-      "Glass": 1
+      "Bookshelf": { "pre": "X", "post": 1 },
+      "Multishot": { "pre": 6, "post": 1 },
+      "Glass": { "pre": "X", "post": 1 }
     }
   },
-  "21 CURED": {
+  "21": {
+    "cured": true,
     "enchantments": {
-      "Knockback II": 1,
-      "Punch II": 4,
-      "Multishot": 1
+      "Knockback II": { "pre": 22, "post": 1 },
+      "Punch II": { "pre": 29, "post": 4 },
+      "Multishot": { "pre": 17, "post": 1 }
     }
   }
 }

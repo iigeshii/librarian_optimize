@@ -5,31 +5,64 @@ from collections import defaultdict
 import re
 import sys
 
-# ----------------------------------------------------------
-# Load villager and enchantment data
-# named_villagers.json is provided as the required argument
-# enchantments.json is expected in the same directory as the script
-# ----------------------------------------------------------
+# ==========================================================
+# Helpers
+# ==========================================================
+
+def current_price_for(villagers, villager_name, enchant):
+    """
+    Returns the effective trade price for an enchantment on a villager,
+    choosing 'post' if villager is cured, otherwise 'pre'.
+    Supports:
+      - legacy int price
+      - new {"pre": int|'X'|None, "post": int|'X'|None}
+    Returns None if no usable price.
+    """
+    data = villagers[villager_name]["enchantments"].get(enchant)
+    if data is None:
+        return None
+    if isinstance(data, int):
+        return data
+    cured = bool(villagers[villager_name].get("cured"))
+    val = data.get("post" if cured else "pre")
+    if val in (None, "X"):
+        return None
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return None
+
+
+def strip_roman_numerals(name):
+    return re.sub(r" [IVXLCDM]+$", "", name)
+
+
+def get_enchantment_index(enchantment, required_list):
+    sorted_required = sorted(required_list)
+    try:
+        return sorted_required.index(enchantment) + 1
+    except ValueError:
+        return None
+
+
+# ==========================================================
+# Data loading
+# ==========================================================
+
 def load_data(villagers_file):
     """
-    Load villagers (from `villagers_file`) and the master enchantment catalog
-    (from `enchantments.json` in the script directory).
-
-    EXPECTED JSON FORMAT (no legacy support):
+    EXPECTED enchantments.json FORMAT:
     {
       "villager_enchantments": [
         { "name": "Mending", "priority": 1 },
-        { "name": "Unbreaking III", "priority": 1 },
         ...
       ],
-      "non_enchantments": ["Bookshelf", "Lantern", ...]
+      "non_enchantments": ["Bookshelf", "Lantern", ...],
+      "enchantment_costs": [
+        { "name": "Mending", "pre": 38, "post": 10 },
+        ...
+      ]
     }
-
-    Returns:
-      villagers: dict
-      villager_enchants: set[str]            # set of enchantment names
-      non_enchants: set[str]                 # set of non-enchantment item names
-      enchant_priority: dict[str, int]       # name -> priority (int; e.g., 1,2,10)
     """
     villagers_path = Path(villagers_file)
     enchants_path = Path(__file__).parent / "enchantments.json"
@@ -44,57 +77,117 @@ def load_data(villagers_file):
     with open(enchants_path, "r", encoding="utf-8") as f:
         master = json.load(f)
 
-    # --- Parse villager_enchantments (required, list of objects)
+    # --- villager_enchantments ---
     raw = master.get("villager_enchantments")
     if not isinstance(raw, list) or not raw:
         raise ValueError("enchantments.json must have a non-empty 'villager_enchantments' list.")
 
     enchant_priority = {}
     names_seen = set()
-    for i, entry in enumerate(raw, start=1):
-        if not isinstance(entry, dict):
-            raise ValueError(f"'villager_enchantments[{i}]' must be an object with 'name' and 'priority'.")
+    for entry in raw:
         name = entry.get("name")
         prio = entry.get("priority")
-
         if not isinstance(name, str) or not name.strip():
-            raise ValueError(f"'villager_enchantments[{i}].name' must be a non-empty string.")
+            raise ValueError("Each enchantment must have a name.")
         if name in names_seen:
-            raise ValueError(f"Duplicate enchantment name in 'villager_enchantments': '{name}'.")
+            raise ValueError(f"Duplicate enchantment '{name}'.")
         if not isinstance(prio, int) or prio < 1:
-            raise ValueError(f"'villager_enchantments[{i}].priority' must be an integer >= 1 (got {prio!r}).")
-
+            raise ValueError(f"Invalid priority for {name}: {prio}")
         names_seen.add(name)
         enchant_priority[name] = prio
 
     villager_enchants = set(names_seen)
 
-    # --- Parse non_enchantments (required, list of strings)
+    # --- non_enchantments ---
     non_raw = master.get("non_enchantments")
     if not isinstance(non_raw, list) or not all(isinstance(x, str) for x in non_raw):
         raise ValueError("'non_enchantments' must be a list of strings.")
     non_enchants = set(non_raw)
 
-    # --- Validate villagers' data against master lists
+    # --- enchantment_costs (optional) ---
+    costs_raw = master.get("enchantment_costs", [])
+    enchant_costs = {}
+    if costs_raw:
+        for entry in costs_raw:
+            name = entry.get("name")
+            if not isinstance(name, str):
+                continue
+            enchant_costs[name] = {
+                "pre": entry.get("pre"),
+                "post": entry.get("post")
+            }
+
+    # --- validate villagers ---
     all_master = villager_enchants | non_enchants
     invalid_entries = []
     for v_name, data in villagers.items():
         ench_dict = data.get("enchantments", {})
-        if not isinstance(ench_dict, dict):
-            raise ValueError(f"Villager '{v_name}' has invalid 'enchantments' (expected object).")
         for ench_name in ench_dict.keys():
             if ench_name not in all_master:
                 invalid_entries.append((v_name, ench_name))
-
     if invalid_entries:
-        print("❌ Error: Found unrecognized enchantments in villager data:")
-        for v_name, ench in invalid_entries:
-            print(f"   - {v_name}: '{ench}' not found in master list")
-        print("\n💡 Please fix the villager JSON or update enchantments.json before running again.")
+        print("❌ Error: Unrecognized enchantments:")
+        for v, e in invalid_entries:
+            print(f"  - {v}: '{e}'")
         sys.exit(1)
 
-    return villagers, villager_enchants, non_enchants, enchant_priority
+    return villagers, villager_enchants, non_enchants, enchant_priority, enchant_costs
 
+
+# ==========================================================
+# Cost analysis
+# ==========================================================
+
+def compute_observed_costs(villagers):
+    observed = {}
+    for v_name, vdata in villagers.items():
+        cured = bool(vdata.get("cured"))
+        for ench, val in vdata.get("enchantments", {}).items():
+            pre_val = post_val = None
+            if isinstance(val, int):
+                if cured:
+                    post_val = val
+                else:
+                    pre_val = val
+            elif isinstance(val, dict):
+                pre_raw = val.get("pre")
+                post_raw = val.get("post")
+                pre_val = pre_raw if isinstance(pre_raw, int) else None
+                post_val = post_raw if isinstance(post_raw, int) else None
+
+            slot = observed.setdefault(ench, {"pre": None, "post": None})
+            if pre_val is not None and (slot["pre"] is None or pre_val < slot["pre"]):
+                slot["pre"] = pre_val
+            if post_val is not None and (slot["post"] is None or post_val < slot["post"]):
+                slot["post"] = post_val
+    return observed
+
+
+def print_cost_guide(enchant_priority, enchant_costs, observed_costs):
+    """
+    Print alphabetized cost table using observed villager data.
+    No * marks — all values come from observed sources.
+    """
+    # Combine all names
+    all_names = sorted(set(enchant_priority.keys()) | set(observed_costs.keys()))
+
+    print("\n📊 Cost Guide (alphabetical):")
+    for name in all_names:
+        observed = observed_costs.get(name, {})
+        pre = observed.get("pre")
+        post = observed.get("post")
+        pre_str = "—" if pre is None else str(pre)
+        post_str = "—" if post is None else str(post)
+        print(f"  - {name:<24} pre: {pre_str:>4}   post: {post_str:>4}")
+
+    if not any(isinstance(v.get("pre"), int) or isinstance(v.get("post"), int) for v in observed_costs.values()):
+        print("\n⚠️ No cost data found in villagers file.")
+
+
+
+# ==========================================================
+# Utility printers
+# ==========================================================
 
 def get_villager_enchantments(villagers):
     all_enchants = set()
@@ -104,199 +197,24 @@ def get_villager_enchantments(villagers):
 
 
 def get_non_enchantment_codes(name, villagers, non_enchantments):
-    hints = {
-        "Glass": "Glass",
-        "Nametag": "Nametag",
-        "Bookshelf": "Bookshelf",
-        "Lantern": "Lantern",
-        "Compass": "Compass",
-        "Clock": "Clock",
-    }
+    hints = {"Glass": "Glass", "Nametag": "Nametag", "Bookshelf": "Bookshelf",
+             "Lantern": "Lantern", "Compass": "Compass", "Clock": "Clock"}
 
-    def abbreviation(item):
-        return hints.get(
-            item,
-            item[:2].upper() if len(item.split()) == 1 else "".join(word[0] for word in item.split()).upper()
-        )
+    def abbr(item):
+        return hints.get(item, "".join(w[0] for w in item.split()).upper())
 
-    codes = [
-        abbreviation(ench)
-        for ench in villagers[name]["enchantments"]
-        if ench in non_enchantments
-    ]
-
+    codes = [abbr(e) for e in villagers[name]["enchantments"] if e in non_enchantments]
     return f"({', '.join(codes)})" if codes else ""
-
-
-def optimize_min_villagers(villagers, required):
-    """
-    Greedy set cover: pick the villager that covers the most uncovered required enchantments each step.
-    Returns: dict name -> {"enchantments": {enchant: price, ...}}
-    """
-    remaining = set(required)
-    optimized = {}
-
-    while remaining:
-        best_villager = None
-        best_contribution = set()
-
-        for name, data in villagers.items():
-            enchants = set(data["enchantments"].keys())
-            contribution = enchants & remaining
-            if len(contribution) > len(best_contribution):
-                best_villager = name
-                best_contribution = contribution
-
-        if not best_villager:
-            break
-
-        optimized[best_villager] = {
-            "enchantments": {
-                e: villagers[best_villager]["enchantments"][e]
-                for e in best_contribution
-            }
-        }
-        remaining -= best_contribution
-
-    return optimized
-
-
-def optimize_min_cost(villagers, required):
-    """
-    Cheapest-per-enchantment: for each required enchantment, choose the villager offering the lowest price.
-    Villager count is not considered—cost wins above all else.
-    Returns: dict name -> {"enchantments": {enchant: price, ...}}
-    """
-    result = {}
-    for enchant in sorted(required):
-        best_name = None
-        best_price = float("inf")
-
-        for name, data in villagers.items():
-            price = data["enchantments"].get(enchant)
-            if price is not None:
-                if price < best_price or (price == best_price and (best_name is None or name < best_name)):
-                    best_price = price
-                    best_name = name
-
-        if best_name is not None:
-            result.setdefault(best_name, {"enchantments": {}})
-            result[best_name]["enchantments"][enchant] = villagers[best_name]["enchantments"][enchant]
-    return result
-
-
-def optimize_priority_tiered(villagers, required, enchant_priority, p2_threshold=10):
-    """
-    Priority-aware optimization with a P2 price-gap rule:
-      - Priority 1: must be cheapest per enchantment.
-      - Priority 2: take cheapest only if:
-            (a) the cheapest is already chosen, OR
-            (b) the price gap > p2_threshold compared to the best already-chosen villager's price,
-                OR if none chosen offer it, compared to the second-cheapest overall.
-        Otherwise, defer P2 to the set-cover phase.
-      - Priority >2: minimize additional villager count (price ignored).
-    Returns: dict name -> {"enchantments": {enchant: price, ...}}
-    """
-    # Partition required by priority
-    p1 = {e for e in required if enchant_priority.get(e, 10) == 1}
-    p2 = {e for e in required if enchant_priority.get(e, 10) == 2}
-    p_other = set(required) - p1 - p2
-
-    def cheapest_and_second(enchant):
-        """Return (best_name, best_price, second_best_price or None)."""
-        best_name, best_price = None, float("inf")
-        second_price = None
-        for name, data in villagers.items():
-            price = data["enchantments"].get(enchant)
-            if price is None:
-                continue
-            if price < best_price or (price == best_price and (best_name is None or name < best_name)):
-                second_price = best_price if best_price != float("inf") else second_price
-                best_name, best_price = name, price
-            else:
-                if second_price is None or price < second_price:
-                    second_price = price
-        return best_name, best_price, second_price
-
-    # ---- Step 1: lock in cheapest for P1 (must-have cheapest)
-    chosen = {}  # name -> set(enchants)
-    for e in sorted(p1):
-        v_best, _, _ = cheapest_and_second(e)
-        if v_best is None:
-            continue
-        chosen.setdefault(v_best, set()).add(e)
-
-    # ---- Step 2: P2 rule with price-gap threshold
-    for e in sorted(p2):
-        v_best, p_best, p_second = cheapest_and_second(e)
-        if v_best is None:
-            continue
-
-        # Best price among already-chosen villagers (if any)
-        p_chosen_best = None
-        v_chosen_best = None
-        for v in chosen.keys():
-            price = villagers[v]["enchantments"].get(e)
-            if price is None:
-                continue
-            if p_chosen_best is None or price < p_chosen_best or (price == p_chosen_best and v < v_chosen_best):
-                p_chosen_best = price
-                v_chosen_best = v
-
-        if v_best in chosen:
-            # Free to add (no new villager)
-            chosen[v_best].add(e)
-        elif p_chosen_best is not None:
-            # Compare chosen-best vs true-best
-            if (p_chosen_best - p_best) > p2_threshold:
-                # The cheapest is much cheaper: keep him (add a new villager)
-                chosen.setdefault(v_best, set()).add(e)
-            else:
-                # Use the already-chosen villager to avoid adding new
-                chosen[v_chosen_best].add(e)
-        else:
-            # No chosen villager offers it; compare cheapest vs second-cheapest overall
-            # If the gap is big, keep the cheapest villager now; else defer to set-cover step
-            if p_second is not None and (p_second - p_best) > p2_threshold:
-                chosen.setdefault(v_best, set()).add(e)
-            # else: do nothing; leave it for the set-cover phase
-
-    # Build initial optimized dict from 'chosen'
-    optimized = {}
-    for v, ench_set in chosen.items():
-        optimized[v] = {"enchantments": {e: villagers[v]["enchantments"][e] for e in ench_set}}
-
-    # ---- Step 3: Greedy set cover to minimize villager count for the rest
-    already_assigned = set()
-    for data in optimized.values():
-        already_assigned.update(data["enchantments"].keys())
-
-    remaining = (p_other | p2 | p1) - already_assigned
-
-    while remaining:
-        best_v = None
-        best_cov = set()
-        for name, data in villagers.items():
-            cov = set(data["enchantments"].keys()) & remaining
-            if len(cov) > len(best_cov) or (len(cov) == len(best_cov) and best_v is not None and name < best_v):
-                best_v = name
-                best_cov = cov
-        if not best_v or not best_cov:
-            break
-        optimized.setdefault(best_v, {"enchantments": {}})
-        for e in best_cov:
-            optimized[best_v]["enchantments"][e] = villagers[best_v]["enchantments"][e]
-        remaining -= best_cov
-
-    return optimized
 
 
 def print_all_enchantments(villagers, required):
     enchant_map = defaultdict(list)
     for name, data in villagers.items():
-        for enchant, price in data["enchantments"].items():
+        for enchant in data["enchantments"].keys():
             if enchant in required:
-                enchant_map[enchant].append(f"{name} ({price})")
+                price = current_price_for(villagers, name, enchant)
+                price_str = "?" if price is None else str(price)
+                enchant_map[enchant].append(f"{name} ({price_str})")
 
     print("\n📘 Enchantment coverage:")
     max_name_len = max(len(name) for name in sorted(required)) if required else 0
@@ -308,173 +226,197 @@ def print_all_enchantments(villagers, required):
             print(f"{i+1:>2}. {enchant:<{max_name_len}} : ❌ None")
 
 
-def get_enchantment_index(enchantment, required_list):
+# ==========================================================
+# Optimizers
+# ==========================================================
+
+def optimize_min_villagers(villagers, required):
+    remaining = set(required)
+    optimized = {}
+    while remaining:
+        best_v, best_cov = None, set()
+        for name, data in villagers.items():
+            cov = {e for e in (set(data["enchantments"]) & remaining)
+                   if current_price_for(villagers, name, e) is not None}
+            if len(cov) > len(best_cov):
+                best_v, best_cov = name, cov
+        if not best_v or not best_cov:
+            break
+        optimized[best_v] = {"enchantments": {e: current_price_for(villagers, best_v, e) for e in best_cov}}
+        remaining -= best_cov
+    return optimized
+
+
+def optimize_min_cost(villagers, required):
+    result = {}
+    for enchant in sorted(required):
+        best_name, best_price = None, float("inf")
+        for name in villagers:
+            price = current_price_for(villagers, name, enchant)
+            if price is None:
+                continue
+            if price < best_price or (price == best_price and (best_name is None or name < best_name)):
+                best_name, best_price = name, price
+        if best_name is not None:
+            result.setdefault(best_name, {"enchantments": {}})
+            result[best_name]["enchantments"][enchant] = best_price
+    return result
+
+
+def optimize_priority_tiered(villagers, required, enchant_priority, p2_threshold=10):
     """
-    Returns the 1-based index of the enchantment/item in the sorted global list.
+    Priority-aware optimization:
+      P1 -> absolute cheapest
+      P2 -> cheapest if gap>threshold or villager already chosen
+      Others -> minimize villager count
     """
-    sorted_required = sorted(required_list)
-    try:
-        return sorted_required.index(enchantment) + 1
-    except ValueError:
-        return None  # or raise an error if preferred
+    p1 = {e for e in required if enchant_priority.get(e, 10) == 1}
+    p2 = {e for e in required if enchant_priority.get(e, 10) == 2}
+    p_other = required - p1 - p2
+
+    def cheapest_and_second(e):
+        best, best_price, second = None, float("inf"), None
+        for v in villagers:
+            p = current_price_for(villagers, v, e)
+            if p is None:
+                continue
+            if p < best_price:
+                second, best, best_price = best_price, v, p
+            elif second is None or p < second:
+                second = p
+        return best, best_price, second
+
+    chosen = {}
+    # P1
+    for e in sorted(p1):
+        v_best, _, _ = cheapest_and_second(e)
+        if v_best:
+            chosen.setdefault(v_best, set()).add(e)
+    # P2
+    for e in sorted(p2):
+        v_best, p_best, p_second = cheapest_and_second(e)
+        if not v_best:
+            continue
+        p_chosen_best = min(
+            (current_price_for(villagers, v, e) for v in chosen if current_price_for(villagers, v, e) is not None),
+            default=None,
+        )
+        if v_best in chosen:
+            chosen[v_best].add(e)
+        elif p_chosen_best is not None and (p_chosen_best - p_best) <= p2_threshold:
+            # keep with chosen
+            pass
+        elif p_second is not None and (p_second - p_best) <= p2_threshold:
+            pass
+        else:
+            chosen.setdefault(v_best, set()).add(e)
+
+    optimized = {v: {"enchantments": {e: current_price_for(villagers, v, e) for e in ench}} for v, ench in chosen.items()}
+
+    # Cover remaining enchants minimally
+    assigned = {e for data in optimized.values() for e in data["enchantments"]}
+    remaining = required - assigned
+    while remaining:
+        best_v, best_cov = None, set()
+        for name, data in villagers.items():
+            cov = {e for e in (set(data["enchantments"]) & remaining)
+                   if current_price_for(villagers, name, e) is not None}
+            if len(cov) > len(best_cov):
+                best_v, best_cov = name, cov
+        if not best_v or not best_cov:
+            break
+        optimized.setdefault(best_v, {"enchantments": {}})
+        for e in best_cov:
+            optimized[best_v]["enchantments"][e] = current_price_for(villagers, best_v, e)
+        remaining -= best_cov
+    return optimized
 
 
-def strip_roman_numerals(name):
-    return re.sub(r" [IVXLCDM]+$", "", name)
+# ==========================================================
+# Reporting
+# ==========================================================
 
-
-def emit_optimized_report(method_label, optimized, villagers, required, non_enchantments, enchant_priority):
+def emit_optimized_report(
+    method_label, optimized, villagers, required, non_enchantments, enchant_priority, show_signs=False
+):
     def prio_tag(e):
-        # only show a priority tag if it's an enchantment (not in non_enchantments)
-        if e in non_enchantments:
+        if e in non_enchantments or e not in enchant_priority:
             return ""
-        return f"P{enchant_priority.get(e, '?')}"
-
-
-    all_names = set(villagers)
-    kept = set(optimized)
-    removed = sorted(all_names - kept)
+        return f"P{enchant_priority[e]}"
 
     print(f"\n🧠 Optimized villager set ({method_label}):")
-    max_name_len = max(len(name) for name in villagers) if villagers else 0
+    max_name_len = max(len(name) for name in villagers)
     total_cost = 0
     for i, name in enumerate(sorted(optimized)):
         enchants = optimized[name]["enchantments"]
-        # show priority tags next to each enchantment
-        ench_str = ", ".join(f"{e} [{prio_tag(e)}] ({c})" for e, c in sorted(enchants.items()))
-        total_cost += sum(enchants.values())
+        ench_str = ", ".join(
+            f"{e}{(' [' + prio_tag(e) + ']') if prio_tag(e) else ''} ({'?' if c is None else c})"
+            for e, c in sorted(enchants.items())
+        )
+        total_cost += sum(c for c in enchants.values() if isinstance(c, (int, float)))
         print(f"{i+1:>2}. {name:<{max_name_len}} : {ench_str}")
 
-    # If the method was min-cost, show the total cost for clarity.
     if method_label.startswith("min-cost"):
-        print(f"\n💰 Total cost of chosen trades: {total_cost}")
+        print(f"\n💰 Total cost: {total_cost}")
 
-    print("\n🗑 Removed villagers:")
-    for name in removed:
-        enchants = villagers[name]["enchantments"]
-        ench_str = ", ".join(f"{e} [{prio_tag(e)}] ({c})" for e, c in sorted(enchants.items()))
-        print(f"- {name}: {ench_str}")
-
-    print("\n📐 Layout:")
-    villager_sorted_enchants = {
-        name: sorted(optimized[name]["enchantments"].items())
-        for name in optimized
-    }
-
-    # sort villagers by their first enchant's name for stable order
-    sorted_villagers = sorted(
-        villager_sorted_enchants.items(),
-        key=lambda item: item[1][0][0] if item[1] else ""
-    )
-
-    for i, (name, ench_list) in enumerate(sorted_villagers, start=1):
-        ench_str = " ".join(
-            f"{get_enchantment_index(e, required)}. {strip_roman_numerals(e)}[{prio_tag(e)}]"
-            for e, _ in ench_list
-        )
-        nec = get_non_enchantment_codes(name, villagers, non_enchantments)
-        print(f"{i:>2}. {name:{max_name_len}}: {ench_str}{nec}")
-
-    # Build the per-sign lines (kept your existing structure, now with priorities)
-    required_dict = {item: "" for item in sorted(required)}
-
-    for villager_name, data in optimized.items():
-        sorted_enchants = sorted(data["enchantments"])
-        enchant_str = "\n".join(
-            f"§b{get_enchantment_index(e, required)}. {strip_roman_numerals(e)} §7[{prio_tag(e)}]"
-            for e in sorted_enchants
-        )
-        codes = get_non_enchantment_codes(villager_name, villagers, non_enchantments)
-        if codes:
-            enchant_str += f"\n§e{codes}"
-
-        if sorted_enchants:
-            required_dict[sorted_enchants[0]] = enchant_str
-
-    for enchant in required_dict:
-        if required_dict[enchant] == "":
-            for villager_name, data in optimized.items():
-                ench_list = sorted(data["enchantments"])
-                if enchant in ench_list:
-                    first_enchant = ench_list[0]
-                    see_index = get_enchantment_index(first_enchant, required)
-                    this_index = get_enchantment_index(enchant, required)
-                    required_dict[enchant] = (
-                        f"§b{this_index}. {strip_roman_numerals(enchant)} §7[{prio_tag(enchant)}] "
-                        f"§7§o(See {see_index}. {strip_roman_numerals(first_enchant)})"
-                    )
-                    break
+    if not show_signs:
+        return
 
     print("\n📋 Sign Layout:")
-    for enchant, line in required_dict.items():
-        villager_name = next(
-            (name for name, data in optimized.items() if enchant in data["enchantments"]),
-            None
-        )
-        print(f"------- {villager_name} -------")
-        for segment in line.split("\n"):
-            print(segment)
+    for v, data in optimized.items():
+        print(f"------- {v} -------")
+        for e in sorted(data["enchantments"]):
+            print(f"§b{get_enchantment_index(e, required)}. {strip_roman_numerals(e)}")
+        codes = get_non_enchantment_codes(v, villagers, non_enchantments)
+        if codes:
+            print(f"§e{codes}")
 
+
+# ==========================================================
+# CLI
+# ==========================================================
 
 def main():
     parser = argparse.ArgumentParser(description="Villager Enchantment Optimization")
-    parser.add_argument(
-        "villagers_file",
-        help="Path to named_villagers.json file"
-    )
-    parser.add_argument(
-        "--optimize",
-        action="store_true",
-        help="Run optimization instead of simple coverage listing"
-    )
+    parser.add_argument("villagers_file", help="Path to named_villagers.json file")
+    parser.add_argument("--optimize", action="store_true", help="Run optimization")
     parser.add_argument(
         "--method",
         choices=["min-villagers", "min-cost", "priority-tiered"],
-        default="priority-tiered",
-        help=(
-            "Optimization method: 'min-villagers' (fewest villagers), "
-            "'min-cost' (cheapest overall), or "
-            "'priority-tiered' (P1 cheapest required • P2 cheapest if free • others min villagers)."
-        )
+        default="min-villagers",
     )
-    parser.add_argument(
-        "--p2-threshold",
-        type=int,
-        default=10,
-        help="Emerald price gap required to justify adding a new villager for Priority-2 enchants (default: 10)."
-    )
-
+    parser.add_argument("--p2-threshold", type=int, default=10)
+    parser.add_argument("--show-costs", action="store_true", help="Show cost guide")
+    parser.add_argument("--show-signs", action="store_true", help="Show sign layout")
     args = parser.parse_args()
 
-    # Load data: named_villagers.json from argument, enchantments.json from script dir
-    villagers, required, non_enchantments, enchant_priority = load_data(args.villagers_file)
+    villagers, required, non_enchantments, enchant_priority, enchant_costs = load_data(args.villagers_file)
+
+    if args.show_costs:
+        observed = compute_observed_costs(villagers)
+        print_cost_guide(enchant_priority, enchant_costs, observed)
 
     if args.optimize:
         if args.method == "min-villagers":
             optimized = optimize_min_villagers(villagers, required)
-            label = "minimum number of villagers to cover all enchantments"
+            label = "min-villagers (fewest villagers)"
         elif args.method == "min-cost":
             optimized = optimize_min_cost(villagers, required)
-            label = "min-cost (cheapest price per enchantment overall)"
-        elif args.method == "priority-tiered":
-            optimized = optimize_priority_tiered(villagers, required, enchant_priority, p2_threshold=args.p2_threshold)
-            label = (
-                f"priority-tiered (P1 cheapest required • "
-                f"P2 cheapest if free or gap>{args.p2_threshold} • others min villagers)"
-            )
+            label = "min-cost (cheapest overall)"
+        else:
+            optimized = optimize_priority_tiered(villagers, required, enchant_priority, args.p2_threshold)
+            label = f"priority-tiered (P1 absolute, P2 gap>{args.p2_threshold})"
 
-        emit_optimized_report(label, optimized, villagers, required, non_enchantments, enchant_priority)
-
+        emit_optimized_report(label, optimized, villagers, required, non_enchantments, enchant_priority, args.show_signs)
     else:
         villager_enchants = get_villager_enchantments(villagers)
         missing = sorted(required - villager_enchants)
         if missing:
-            print("📜 Missing enchantments from villagers:")
+            print("📜 Missing enchantments:")
             for m in missing:
                 print(f"- {m}")
         else:
-            print("✅ All enchantments are covered by the villagers!")
-
+            print("✅ All enchantments are covered!")
         print_all_enchantments(villagers, required)
 
 
