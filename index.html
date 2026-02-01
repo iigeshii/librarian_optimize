@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Villager Planner (Cost == 1)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<style>
+  body {
+    margin: 0;
+    padding: 16px;
+    background: #0b0f14;
+    color: #e7eef7;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  }
+  h1 { margin: 0 0 12px; font-size: 20px; }
+  .panel {
+    background: #121a24;
+    border: 1px solid #223044;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+  .row {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .grid {
+    display: grid;
+    gap: 12px;
+  }
+  @media (min-width: 1000px) {
+    .grid { grid-template-columns: 1fr 1fr 1fr; }
+  }
+  .muted { color: #a9b7c9; font-size: 12px; }
+  .ok { color: #8ee5a1; }
+  .error { color: #ff9aa5; }
+
+  input[type="text"] {
+    background: #0b0f14;
+    color: #e7eef7;
+    border: 1px solid #223044;
+    padding: 8px 10px;
+    border-radius: 8px;
+    min-width: 260px;
+  }
+  button {
+    background: #1d2a3c;
+    color: #e7eef7;
+    border: 1px solid #2b3f5d;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+  button:hover { background: #22344c; }
+
+  table { width: 100%; border-collapse: collapse; }
+  th, td {
+    border-bottom: 1px solid #223044;
+    padding: 10px;
+    vertical-align: top;
+  }
+  th {
+    position: sticky;
+    top: 0;
+    background: #121a24;
+    color: #cfe2ff;
+    text-align: left;
+  }
+  .pill {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid #2b3f5d;
+    margin: 2px 6px 2px 0;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .cost1 { border-color: #2c6b3f; }
+  .costN { border-color: #5d3b2b; }
+  .mono {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 12px;
+    white-space: pre;
+  }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 8px;
+    border: 1px solid #2b3f5d;
+    font-size: 12px;
+    margin-left: 8px;
+  }
+  .tag.best { border-color: #2c6b3f; }
+</style>
+</head>
+
+<body>
+<h1>Villager Planner — Cost == 1 Only</h1>
+
+<div class="panel">
+  <div class="row">
+    <label>Search:
+      <input id="search" type="text" placeholder="villager or enchant…" />
+    </label>
+    <label><input id="onlyGoal" type="checkbox" checked> goal enchants only</label>
+    <label><input id="onlyCost1" type="checkbox"> cost==1 only</label>
+    <button id="reloadBtn">Reload JSON</button>
+  </div>
+  <div class="muted" id="status">Idle</div>
+</div>
+
+<div class="panel grid">
+  <div>
+    <div class="muted">Best set (minimum villagers covering all cost==1 obtainable goal enchants)</div>
+    <div id="bestSet"></div>
+  </div>
+  <div>
+    <div class="muted">Missing enchantments (no cost==1 source exists)</div>
+    <div id="missingList"></div>
+  </div>
+  <div>
+    <div class="muted">Extraneous villagers</div>
+    <div id="extrasList"></div>
+  </div>
+</div>
+
+<div class="panel">
+  <table>
+    <thead>
+      <tr>
+        <th style="width:200px">Villager</th>
+        <th>Enchantments</th>
+        <th style="width:220px">Add-ons</th>
+        <th style="width:360px">Sign code</th>
+      </tr>
+    </thead>
+    <tbody id="tbody"></tbody>
+  </table>
+</div>
+
+<script>
+(() => {
+  // Fixed local files (NOT user-selectable)
+  const VILLAGERS_JSON = "./Pixel_Pioneers_Gesh.json";
+  const ENCHANTMENTS_JSON = "./enchantments.json";
+
+  // Safe aliases (single-level or common "I" formatting)
+  const ALIASES = {
+    "Aqua Affinity I": "Aqua Affinity",
+    "Channeling I": "Channeling",
+    "Curse of Binding I": "Curse of Binding",
+    "Curse of Vanishing I": "Curse of Vanishing",
+    "Flame I": "Flame",
+    "Infinity I": "Infinity",
+    "Mending I": "Mending",
+    "Multishot I": "Multishot",
+    "Silk Touch I": "Silk Touch"
+  };
+
+  const $ = (id) => document.getElementById(id);
+  const normalize = (k) => (ALIASES[(k ?? "").toString().trim()] || (k ?? "").toString().trim());
+
+  function priceFor(v, raw) {
+    if (typeof raw === "number") return raw;
+    if (raw && typeof raw === "object") {
+      const cured = !!v.cured;
+      const val = raw[cured ? "post" : "pre"];
+      if (val === null || val === undefined || val === "X") return null;
+      const n = Number(val);
+      return Number.isFinite(n) ? n : null;
+    }
+    return null;
+  }
+
+  function bitCount32(x) {
+    x = x - ((x >>> 1) & 0x55555555);
+    x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
+    return (((x + (x >>> 4)) & 0x0F0F0F0F) * 0x01010101) >>> 24;
+  }
+
+  async function loadJSON(path) {
+    const r = await fetch(path, { cache: "no-store" });
+    if (!r.ok) throw new Error(`Failed to load ${path} (${r.status})`);
+    return r.json();
+  }
+
+  function pillHTML(text, isCost1) {
+    return `<span class="pill ${isCost1 ? "cost1" : "costN"}">${escapeHtml(text)}</span>`;
+  }
+
+  function escapeHtml(s) {
+    return (s ?? "").toString()
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
+  function buildSign(name, goalCost1Names, addonNames) {
+    const line1 = `§b${name}`;
+    const top = goalCost1Names.slice(0, 2).join(" | ");
+    const rest = goalCost1Names.slice(2, 6).join(", ");
+    const line2 = top ? `§f${top}` : "§7NO $1 GOALS";
+    const line3 = rest ? `§7${rest}` : "§8";
+    const line4 = addonNames.length ? `§e${addonNames.slice(0, 3).join(" ")}` : "§8";
+    return [line1, line2, line3, line4].join("\n");
+  }
+
+  // ----- Compute cost==1 coverage for goals -----
+  function computeCost1Coverage(villagers, goals) {
+    const goalList = [...goals].sort((a,b)=>a.localeCompare(b));
+    const idx = new Map(goalList.map((g,i)=>[g,i]));
+
+    const villagerMasks = []; // {name, mask, covers:[...]}
+    let obtainableMask = 0;
+
+    for (const name of Object.keys(villagers).sort((a,b)=>a.localeCompare(b))) {
+      const v = villagers[name];
+      const enchRaw = v.enchantments || {};
+      let mask = 0;
+      const covers = [];
+
+      for (const g of goalList) {
+        let p = null;
+
+        // direct key lookup
+        if (Object.prototype.hasOwnProperty.call(enchRaw, g)) {
+          p = priceFor(v, enchRaw[g]);
+        } else {
+          // alias scan
+          for (const [k,val] of Object.entries(enchRaw)) {
+            if (normalize(k) === g) { p = priceFor(v, val); break; }
+          }
+        }
+
+        if (p === 1) {
+          const bit = idx.get(g);
+          mask |= (1 << bit);
+          covers.push(g);
+        }
+      }
+
+      if (mask !== 0) {
+        villagerMasks.push({ name, mask, covers: covers.sort((a,b)=>a.localeCompare(b)) });
+        obtainableMask |= mask;
+      }
+    }
+
+    const obtainable = goalList.filter(g => ((obtainableMask >> idx.get(g)) & 1) === 1);
+    const missing = goalList.filter(g => ((obtainableMask >> idx.get(g)) & 1) === 0);
+
+    return { goalList, idx, villagerMasks, obtainableMask, obtainable, missing };
+  }
+
+  // ----- Exact minimum set cover (branch & bound) -----
+  function solveMinSetCoverExact(villagerMasks, targetMask) {
+    if (targetMask === 0) return [];
+
+    const items = [...villagerMasks].sort((a,b)=>bitCount32(b.mask) - bitCount32(a.mask));
+    const maxCover = items.length ? bitCount32(items[0].mask) : 0;
+    if (maxCover === 0) return null;
+
+    const bitToItems = new Map();
+    for (let i = 0; i < items.length; i++) {
+      let m = items[i].mask;
+      while (m) {
+        const lsb = m & -m;
+        const bit = (Math.log2(lsb) | 0);
+        if (!bitToItems.has(bit)) bitToItems.set(bit, []);
+        bitToItems.get(bit).push(i);
+        m ^= lsb;
+      }
+    }
+
+    function greedyUpperBound() {
+      let rem = targetMask;
+      const chosen = [];
+      while (rem) {
+        let best = -1, bestGain = 0;
+        for (let i = 0; i < items.length; i++) {
+          const gain = bitCount32(items[i].mask & rem);
+          if (gain > bestGain) { bestGain = gain; best = i; }
+        }
+        if (best < 0 || bestGain === 0) return null;
+        chosen.push(best);
+        rem &= ~items[best].mask;
+      }
+      return chosen;
+    }
+
+    const ub = greedyUpperBound();
+    let best = ub ? [...ub] : null;
+    let bestLen = ub ? ub.length : Infinity;
+
+    function pickMRVBit(remMask) {
+      let mm = remMask;
+      let bestBit = null, bestCount = 1e9;
+      while (mm) {
+        const lsb = mm & -mm;
+        const bit = (Math.log2(lsb) | 0);
+        const c = (bitToItems.get(bit) || []).length;
+        if (c < bestCount) {
+          bestCount = c;
+          bestBit = bit;
+          if (c <= 1) break;
+        }
+        mm ^= lsb;
+      }
+      return bestBit;
+    }
+
+    function dfs(chosen, covered) {
+      if (covered === targetMask) {
+        if (chosen.length < bestLen) {
+          bestLen = chosen.length;
+          best = [...chosen];
+        }
+        return;
+      }
+      if (chosen.length >= bestLen) return;
+
+      const remaining = targetMask & ~covered;
+      const remBits = bitCount32(remaining);
+      const lower = Math.ceil(remBits / maxCover);
+      if (chosen.length + lower >= bestLen) return;
+
+      const bit = pickMRVBit(remaining);
+      if (bit == null) return;
+
+      const candidates = (bitToItems.get(bit) || [])
+        .slice()
+        .sort((i,j) => bitCount32(items[j].mask & remaining) - bitCount32(items[i].mask & remaining));
+
+      for (const i of candidates) {
+        const newCovered = covered | items[i].mask;
+        if (newCovered === covered) continue;
+        dfs([...chosen, i], newCovered);
+      }
+    }
+
+    dfs([], 0);
+
+    if (!best) return null;
+    return best.map(i => items[i].name);
+  }
+
+  // ----- Rendering -----
+  function renderOptimizationPanels(villagers, goalList) {
+    const { villagerMasks, obtainableMask, missing } = computeCost1Coverage(villagers, goalList);
+    const best = solveMinSetCoverExact(villagerMasks, obtainableMask) || [];
+    const bestSet = new Set(best);
+
+    // Missing
+    $("missingList").innerHTML = missing.length
+      ? missing.map(e => pillHTML(e, false)).join(" ")
+      : `<span class="ok">None</span>`;
+
+    // Best set
+    if (!best.length) {
+      $("bestSet").innerHTML = `<span class="muted">(none)</span>`;
+    } else {
+      const lines = [];
+      for (const name of best) {
+        const covers = (villagerMasks.find(x => x.name === name)?.covers) || [];
+        lines.push(`<div><b>${escapeHtml(name)}</b>: ${covers.map(c => pillHTML(c, true)).join(" ")}</div>`);
+      }
+      $("bestSet").innerHTML = `<div class="muted">Count: <b>${best.length}</b></div>` + lines.join("");
+    }
+
+    // Extraneous
+    const extras = Object.keys(villagers)
+      .filter(n => !bestSet.has(n))
+      .sort((a,b)=>a.localeCompare(b));
+
+    $("extrasList").innerHTML = extras.length
+      ? `<div class="muted">Count: <b>${extras.length}</b></div>` + extras.map(n => `<span class="pill">${escapeHtml(n)}</span>`).join(" ")
+      : `<span class="ok">None</span>`;
+
+    return bestSet; // for table badges
+  }
+
+  function renderTable(villagers, goalList, addonList, bestSet) {
+    const tbody = $("tbody");
+    tbody.innerHTML = "";
+
+    const goalSet = new Set(goalList);
+    const addonSet = new Set(addonList);
+
+    const searchTerm = $("search").value.trim().toLowerCase();
+    const onlyGoal = $("onlyGoal").checked;
+    const onlyCost1 = $("onlyCost1").checked;
+
+    const names = Object.keys(villagers).sort((a,b)=>a.localeCompare(b));
+
+    let shown = 0;
+
+    for (const name of names) {
+      const v = villagers[name];
+      const enchRaw = v.enchantments || {};
+
+      const goalEnchants = [];
+      const otherEnchants = [];
+      const addons = [];
+
+      for (const [k,val] of Object.entries(enchRaw)) {
+        const nk = normalize(k);
+        const p = priceFor(v, val);
+
+        if (goalSet.has(nk)) goalEnchants.push({ name: nk, price: p });
+        else if (addonSet.has(nk)) addons.push(nk);
+        else otherEnchants.push({ name: nk, price: p });
+      }
+
+      goalEnchants.sort((a,b)=>a.name.localeCompare(b.name));
+      otherEnchants.sort((a,b)=>a.name.localeCompare(b.name));
+      addons.sort((a,b)=>a.localeCompare(b));
+
+      let displayed = onlyGoal ? goalEnchants : goalEnchants.concat(otherEnchants);
+      if (onlyCost1) displayed = displayed.filter(e => e.price === 1);
+
+      // Search blob includes villager name + all goal/other enchants + addons (not just displayed)
+      const blob = [
+        name,
+        ...goalEnchants.map(e => `${e.name} ${e.price ?? ""}`),
+        ...otherEnchants.map(e => `${e.name} ${e.price ?? ""}`),
+        ...addons
+      ].join(" ").toLowerCase();
+
+      if (searchTerm && !blob.includes(searchTerm)) continue;
+
+      const goalCost1 = goalEnchants.filter(e => e.price === 1).map(e => e.name);
+      const sign = buildSign(name, goalCost1, addons);
+
+      const tr = document.createElement("tr");
+
+      const tdName = document.createElement("td");
+      tdName.innerHTML = `<b>${escapeHtml(name)}</b>` + (bestSet.has(name) ? ` <span class="tag best">BEST SET</span>` : ``);
+      tr.appendChild(tdName);
+
+      const tdEnch = document.createElement("td");
+      if (!displayed.length) {
+        tdEnch.innerHTML = `<span class="muted">(none)</span>`;
+      } else {
+        tdEnch.innerHTML = displayed.map(e => {
+          const cls = (e.price === 1) ? "cost1" : "costN";
+          const p = (e.price === null || e.price === undefined) ? "?" : e.price;
+          return `<span class="pill ${cls}">${escapeHtml(e.name)} (${p})</span>`;
+        }).join("");
+      }
+      tr.appendChild(tdEnch);
+
+      const tdAdd = document.createElement("td");
+      tdAdd.innerHTML = addons.length ? escapeHtml(addons.join(", ")) : `<span class="muted">(none)</span>`;
+      tr.appendChild(tdAdd);
+
+      const tdSign = document.createElement("td");
+      const pre = document.createElement("pre");
+      pre.className = "mono";
+      pre.textContent = sign;
+      tdSign.appendChild(pre);
+
+      const btn = document.createElement("button");
+      btn.textContent = "Copy";
+      btn.style.marginTop = "6px";
+      btn.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(sign);
+          btn.textContent = "Copied!";
+          setTimeout(() => (btn.textContent = "Copy"), 900);
+        } catch {
+          btn.textContent = "Clipboard blocked";
+          setTimeout(() => (btn.textContent = "Copy"), 1200);
+        }
+      });
+      tdSign.appendChild(btn);
+      tr.appendChild(tdSign);
+
+      tbody.appendChild(tr);
+      shown++;
+    }
+
+    $("status").innerHTML = `<span class="ok">Loaded</span> — showing ${shown} / ${names.length} villagers`;
+  }
+
+  // ----- App state -----
+  let _villagers = null;
+  let _goalList = [];
+  let _addonList = [];
+  let _bestSet = new Set();
+
+  async function reload() {
+    try {
+      $("status").textContent = "Loading…";
+      const [villagers, master] = await Promise.all([
+        loadJSON(VILLAGERS_JSON),
+        loadJSON(ENCHANTMENTS_JSON)
+      ]);
+
+      _villagers = villagers;
+
+      _goalList = (master.villager_enchantments || [])
+        .filter(e => e && e.active !== false && typeof e.name === "string")
+        .map(e => e.name.trim())
+        .filter(Boolean)
+        .sort((a,b)=>a.localeCompare(b));
+
+      _addonList = Array.isArray(master.non_enchantments)
+        ? master.non_enchantments.map(s => normalize(s)).filter(Boolean).sort((a,b)=>a.localeCompare(b))
+        : [];
+
+      _bestSet = renderOptimizationPanels(_villagers, _goalList);
+      renderTable(_villagers, _goalList, _addonList, _bestSet);
+
+      // Wire inputs (search/filters) to rerender table only
+      const rerender = () => {
+        if (!_villagers) return;
+        renderTable(_villagers, _goalList, _addonList, _bestSet);
+      };
+      $("search").oninput = rerender;
+      $("onlyGoal").onchange = rerender;
+      $("onlyCost1").onchange = rerender;
+
+    } catch (e) {
+      console.error(e);
+      $("status").innerHTML = `<span class="error">Error:</span> ${escapeHtml(e.message)}`;
+    }
+  }
+
+  $("reloadBtn").addEventListener("click", reload);
+  reload();
+})();
+</script>
+
+</body>
+</html>
