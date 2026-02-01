@@ -1,58 +1,330 @@
+import json
+from pathlib import Path
+import argparse
+import re
+import sys
 
-Z: Zane, Zachary, Zander, Zion
-Avid Andy
-Busy Barry
+# ==========================================================
+# Helpers
+# ==========================================================
+
+def current_price_for(villagers, villager_name, enchant):
+    """
+    Returns the effective trade price for an enchantment on a villager,
+    choosing 'post' if villager is cured, otherwise 'pre'.
+
+    Supports:
+      - legacy int price
+      - {"pre": int|'X'|None, "post": int|'X'|None}
+
+    Returns None if no usable price.
+    """
+    data = villagers[villager_name]["enchantments"].get(enchant)
+    if data is None:
+        return None
+
+    if isinstance(data, int):
+        return data
+
+    cured = bool(villagers[villager_name].get("cured"))
+    val = data.get("post" if cured else "pre")
+    if val in (None, "X"):
+        return None
+    try:
+        return int(val)
+    except (TypeError, ValueError):
+        return None
 
 
-"12": {
-    "cured": true,
-    "enchantments": {
-      "Lantern": { "pre": 1, "post": 1 },
-      "Clock": { "pre": 5, "post": 1 }
+def strip_roman_numerals(name: str) -> str:
+    return re.sub(r" [IVXLCDM]+$", "", name)
+
+
+# ==========================================================
+# Data loading
+# ==========================================================
+
+def load_data(villagers_file):
+    """
+    EXPECTED enchantments.json FORMAT:
+    {
+      "villager_enchantments": [
+        { "name": "Mending", ... optional fields ... },
+        ...
+      ],
+      "non_enchantments": ["Bookshelf", "Lantern", ...]
     }
-  },
-  "16": {
-    "cured": true,
-    "enchantments": {
-      "Compass": { "pre": 4, "post": 1 }
-    }
-  },
-  "19": {
-    "cured": true,
-    "enchantments": {
-      "Flame": { "pre": 9, "post": 1 },
-      "Compass": { "pre": "X", "post": 1 }
-    }
-  },
-  "20": {
-    "cured": true,
-    "enchantments": {
-      "Bookshelf": { "pre": "X", "post": 1 },
-      "Multishot": { "pre": 6, "post": 1 },
-      "Glass": { "pre": "X", "post": 1 }
-    }
-  },
-  "34": {
-    "cured": true,
-    "enchantments": {
-      "Bookshelf": { "pre": 9, "post": 3 },
-      "Glass": { "pre": 1, "post": 1 },
-      "Clock": { "pre": 5, "post": 1 }
-    }
-  },
-  "36": {
-    "cured": true,
-    "enchantments": {
-      "Glass": { "pre": 1, "post": 1 },
-      "Compass": { "pre": 4, "post": 1 }
-    }
-  },
-  "40": {
-    "cured": true,
-    "enchantments": {
-      "Multishot": { "pre": 25, "post": 1 },
-      "Lantern": { "pre": 1, "post": 1 },
-      "Clock": { "pre": 5, "post": 1 }
-    }
-  }
-}
+    """
+    villagers_path = Path(villagers_file)
+    enchants_path = Path(__file__).parent / "enchantments.json"
+
+    if not villagers_path.exists():
+        raise FileNotFoundError(f"Missing file: {villagers_path}")
+    if not enchants_path.exists():
+        raise FileNotFoundError(f"Missing file: {enchants_path}")
+
+    with open(villagers_path, "r", encoding="utf-8") as f:
+        villagers = json.load(f)
+    with open(enchants_path, "r", encoding="utf-8") as f:
+        master = json.load(f)
+
+    # --- required enchantments (active != false) ---
+    raw = master.get("villager_enchantments")
+    if not isinstance(raw, list) or not raw:
+        raise ValueError("enchantments.json must have a non-empty 'villager_enchantments' list.")
+
+    required = []
+    seen = set()
+    for entry in raw:
+        if not entry.get("active", True):
+            continue
+        name = entry.get("name")
+        if not isinstance(name, str) or not name.strip():
+            raise ValueError("Each enchantment must have a non-empty string 'name'.")
+        if name in seen:
+            raise ValueError(f"Duplicate enchantment '{name}'.")
+        seen.add(name)
+        required.append(name)
+
+    required_set = set(required)
+
+    # --- non_enchantments (optional) ---
+    non_raw = master.get("non_enchantments", [])
+    if not isinstance(non_raw, list) or not all(isinstance(x, str) for x in non_raw):
+        raise ValueError("'non_enchantments' must be a list of strings if present.")
+    non_enchants = set(non_raw)
+
+    # --- validate villagers only reference known keys (required + non_enchants) ---
+    allowed = required_set | non_enchants
+    invalid_entries = []
+    for v_name, data in villagers.items():
+        ench_dict = data.get("enchantments", {})
+        for ench_name in ench_dict.keys():
+            if ench_name not in allowed:
+                invalid_entries.append((v_name, ench_name))
+    if invalid_entries:
+        print("❌ Error: Unrecognized entries in villagers file (not in enchantments.json):")
+        for v, e in invalid_entries:
+            print(f"  - {v}: '{e}'")
+        sys.exit(1)
+
+    return villagers, required
+
+
+# ==========================================================
+# Build coverage masks (ONLY price == 1 counts)
+# ==========================================================
+
+def build_masks(villagers, required_list):
+    """
+    Returns:
+      - req_index: enchantment -> bit index
+      - villager_masks: list of (villager_name, mask, covered_enchants_list)
+      - full_mask: mask with all required bits set
+    """
+    req_index = {e: i for i, e in enumerate(required_list)}
+    full_mask = (1 << len(required_list)) - 1
+
+    villager_masks = []
+    for v_name in sorted(villagers.keys()):
+        cov = []
+        mask = 0
+        for e in required_list:
+            price = current_price_for(villagers, v_name, e)
+            if price == 1:
+                cov.append(e)
+                mask |= (1 << req_index[e])
+        if mask:
+            villager_masks.append((v_name, mask, cov))
+
+    return req_index, villager_masks, full_mask
+
+
+# ==========================================================
+# Exact minimum set cover (branch & bound)
+# ==========================================================
+
+def solve_min_villagers_exact(villager_masks, full_mask, required_list):
+    """
+    Finds the smallest subset of villagers whose masks OR to full_mask.
+    Exact branch-and-bound.
+    """
+    # Quick greedy upper bound (for pruning)
+    def greedy_upper_bound():
+        remaining = full_mask
+        chosen = []
+        candidates = villager_masks[:]
+        while remaining:
+            best = None
+            best_gain = 0
+            for v, m, _ in candidates:
+                gain = (m & remaining).bit_count()
+                if gain > best_gain:
+                    best_gain = gain
+                    best = (v, m)
+            if not best:
+                return None
+            v, m = best
+            chosen.append(v)
+            remaining &= ~m
+        return chosen
+
+    greedy = greedy_upper_bound()
+    best_solution = greedy[:] if greedy else None
+    best_len = len(best_solution) if best_solution else float("inf")
+
+    # Pre-sort villagers by mask size (descending) to find good solutions quickly
+    villagers_sorted = sorted(villager_masks, key=lambda t: t[1].bit_count(), reverse=True)
+
+    # Build: for each enchant bit, which villagers can cover it
+    bit_to_villagers = [[] for _ in range(len(required_list))]
+    for idx, (v, m, _) in enumerate(villagers_sorted):
+        mm = m
+        while mm:
+            lsb = mm & -mm
+            bit = (lsb.bit_length() - 1)
+            bit_to_villagers[bit].append(idx)
+            mm -= lsb
+
+    # Choose an uncovered bit with fewest options (MRV heuristic)
+    def pick_next_bit(uncovered_mask):
+        best_bit = None
+        best_count = 10**9
+        mm = uncovered_mask
+        while mm:
+            lsb = mm & -mm
+            bit = (lsb.bit_length() - 1)
+            c = len(bit_to_villagers[bit])
+            if c < best_count:
+                best_count = c
+                best_bit = bit
+                if c == 1:
+                    break
+            mm -= lsb
+        return best_bit
+
+    # A fast optimistic lower bound: ceil(remaining_bits / max_cover_bits)
+    max_cover = max((m.bit_count() for _, m, _ in villagers_sorted), default=0)
+
+    def dfs(chosen_indices, covered_mask):
+        nonlocal best_solution, best_len
+
+        if covered_mask == full_mask:
+            if len(chosen_indices) < best_len:
+                best_len = len(chosen_indices)
+                best_solution = [villagers_sorted[i][0] for i in chosen_indices]
+            return
+
+        if len(chosen_indices) >= best_len:
+            return
+
+        remaining = full_mask & ~covered_mask
+        remaining_bits = remaining.bit_count()
+        if max_cover == 0:
+            return
+        lower = (remaining_bits + max_cover - 1) // max_cover
+        if len(chosen_indices) + lower >= best_len:
+            return
+
+        bit = pick_next_bit(remaining)
+        if bit is None:
+            return
+
+        # Try villagers that cover this bit, in order of added coverage (descending)
+        cand_idxs = bit_to_villagers[bit]
+        if not cand_idxs:
+            return
+
+        # Order: those that cover the most of what's remaining first
+        ordered = sorted(
+            cand_idxs,
+            key=lambda i: (villagers_sorted[i][1] & remaining).bit_count(),
+            reverse=True
+        )
+
+        for i in ordered:
+            v, m, _ = villagers_sorted[i]
+            new_covered = covered_mask | m
+            # quick prune if it doesn't add anything new
+            if new_covered == covered_mask:
+                continue
+            dfs(chosen_indices + [i], new_covered)
+
+    dfs([], 0)
+    return best_solution
+
+
+# ==========================================================
+# Reporting
+# ==========================================================
+
+def report_solution(solution, villagers, required_list):
+    req_set = set(required_list)
+
+    if not solution:
+        print("❌ No solution found.")
+        return
+
+    print(f"\n✅ Minimum librarians (cost==1 only): {len(solution)}\n")
+    for n, v_name in enumerate(solution, start=1):
+        covered = []
+        for e in required_list:
+            if current_price_for(villagers, v_name, e) == 1:
+                covered.append(e)
+        covered_str = ", ".join(covered)
+        print(f"{n:>2}. {v_name}: {covered_str}")
+
+    # Show any missing (should be none)
+    covered_all = set()
+    for v_name in solution:
+        for e in required_list:
+            if current_price_for(villagers, v_name, e) == 1:
+                covered_all.add(e)
+
+    missing = sorted(req_set - covered_all)
+    if missing:
+        print("\n⚠️ Still missing (no cost==1 coverage in chosen set):")
+        for e in missing:
+            print(f" - {e}")
+
+
+def report_impossible(required_list, villager_masks, full_mask):
+    # Determine which enchantments have zero cost==1 coverage
+    covered_mask = 0
+    for _, m, _ in villager_masks:
+        covered_mask |= m
+
+    missing_bits = full_mask & ~covered_mask
+    if not missing_bits:
+        return False
+
+    print("❌ Impossible under rule 'cost==1 only'. No villager offers cost==1 for:")
+    for i, e in enumerate(required_list):
+        if (missing_bits >> i) & 1:
+            print(f" - {e}")
+    return True
+
+
+# ==========================================================
+# CLI
+# ==========================================================
+
+def main():
+    parser = argparse.ArgumentParser(description="Exact minimum librarians (ONLY cost==1 trades count).")
+    parser.add_argument("villagers_file", help="Path to named_villagers.json")
+    args = parser.parse_args()
+
+    villagers, required_list = load_data(args.villagers_file)
+    required_list = sorted(required_list, key=str.lower)
+
+    _, villager_masks, full_mask = build_masks(villagers, required_list)
+
+    if report_impossible(required_list, villager_masks, full_mask):
+        sys.exit(2)
+
+    solution = solve_min_villagers_exact(villager_masks, full_mask, required_list)
+    report_solution(solution, villagers, required_list)
+
+
+if __name__ == "__main__":
+    main()

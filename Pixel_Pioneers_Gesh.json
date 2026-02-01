@@ -2,58 +2,49 @@
   "Alden": {
     "enchantments": {
       "Breach IV": 20,
-      "Multishot I": 1,
+      "Multishot": 1,
       "Lantern": 1,
-      "Glass": 1,
-      "Nametag": 14
+      "Glass": 1
     }
   },
   "Bram": {
     "enchantments": {
-      "Bane of Arthropods IV": 32,
-      "Channeling I": 1,
-      "Infinity I": 1,
-      "Respiration III": 3,
-      "Nametag": 14
+      "Channeling": 1,
+      "Infinity": 1,
+      "Respiration III": 3
     }
   },
   "Cedric": {
     "enchantments": {
       "Density V": 3,
       "Fire Protection IV": 1,
-      "Flame I": 1,
+      "Flame": 1,
       "Compass": 1
     }
   },
   "Desmond": {
     "enchantments": {
-      "Blast Protection IV": 8,
       "Frost Walker II": 23,
-      "Power V": 22,
-      "Glass": 1,
-      "Nametag": 14
+      "Glass": 1
     }
   },
   "Elias": {
     "enchantments": {
-      "Curse of Binding I": 1,
-      "Piercing IV": 32, 
+      "Curse of Binding": 1,
+      "Piercing IV": 32,
       "Glass": 1,
       "Clock": 1
     }
   },
   "Finn": {
     "enchantments": {
-      "Density IV": 1,
-      "Mending I": 1,
-      "Sharpness II": 1,
-      "Silk Touch I": 1, 
-      "Nametag": 14
+      "Mending": 1,
+      "Silk Touch": 1
     }
   },
   "Gideon": {
     "enchantments": {
-      "Protection IV": 32, 
+      "Protection IV": 32,
       "Lantern": 1,
       "Glass": 1,
       "Compass": 1
@@ -61,7 +52,6 @@
   },
   "Hugo": {
     "enchantments": {
-      "Loyalty II": 1,
       "Riptide III": 1,
       "Lantern": 1,
       "Compass": 1
@@ -71,15 +61,13 @@
     "enchantments": {
       "Unbreaking III": 9,
       "Lantern": 1,
-      "Glass": 1, 
-      "Compass": 1,
-      "Nametag": 14
+      "Glass": 1,
+      "Compass": 1
     }
   },
   "Jasper": {
     "enchantments": {
-      "Impaling IV": 21,
-      "Loyalty III": 1, 
+      "Loyalty III": 1,
       "Lantern": 1,
       "Clock": 1
     }
@@ -87,7 +75,6 @@
   "Kellan": {
     "enchantments": {
       "Depth Strider III": 1,
-      "Thorns II": 1,
       "Lantern": 1,
       "Compass": 1
     }
@@ -95,33 +82,28 @@
   "Leon": {
     "enchantments": {
       "Impaling V": 4,
-      "Knockback I": 1,
-      "Silk Touch I": 1,
-      "Lantern": 1, 
-      "Nametag": 14
+      "Silk Touch": 1,
+      "Lantern": 1
     }
   },
   "Milo": {
     "enchantments": {
-      "Blast Protection II": 1,
-      "Depth Strider II": 1,
+      "Depth Strider III": 1,
       "Efficiency V": 2,
-      "Knockback II": 1,
-      "Nametag": 14
+      "Knockback II": 1
     }
   },
   "Nolan": {
     "enchantments": {
       "Looting III": 1,
-      "Piercing I": 1,
       "Lantern": 1,
       "Compass": 1
     }
   },
   "Orin": {
     "enchantments": {
-      "Curse of Binding I": 1,
-      "Projectile Protection IV": 1, 
+      "Curse of Binding": 1,
+      "Projectile Protection IV": 1,
       "Lantern": 1,
       "Clock": 1
     }
@@ -130,7 +112,6 @@
     "enchantments": {
       "Lure III": 1,
       "Quick Charge III": 1,
-      "Sharpness V": 15,
       "Clock": 1
     }
   },
@@ -138,32 +119,26 @@
     "enchantments": {
       "Knockback II": 1,
       "Luck of the Sea III": 1,
-      "Multishot I": 1,
-      "Thorns III": 3,
-      "Nametag": 14
+      "Multishot": 1
     }
   },
   "Rowan": {
     "enchantments": {
-      "Smite V": 32, 
+      "Smite V": 32,
       "Lantern": 1,
       "Glass": 1,
-      "Compass": 1,
-      "Nametag": 1
+      "Compass": 1
     }
   },
   "Sterling": {
     "enchantments": {
-      "Fortune III": 13,
-      "Knockback I": 1,
-      "Bookshelf": 3,
-      "Clock": 1
+      "Clock": 1,
+      "Bookshelf": 3
     }
   },
   "Ulysses": {
     "enchantments": {
       "Fire Aspect II": 1,
-      "Quick Charge II": 2,
       "Glass": 1,
       "Clock": 1
     }
@@ -171,24 +146,18 @@
   "Vance": {
     "enchantments": {
       "Aqua Affinity": 1,
-      "Projectile Protection III": 1,
-      "Respiration I": 1,
       "Clock": 1
     }
   },
   "Wesley": {
     "enchantments": {
       "Bane of Arthropods V": 1,
-      "Infinity I": 1,
-      "Quick Charge I": 1,
-      "Riptide II": 1,
-      "Nametag": 14
+      "Infinity": 1
     }
   },
   "Xander": {
     "enchantments": {
-      "Curse of Vanishing I": 1,
-      "Luck of the Sea II": 1,
+      "Curse of Vanishing": 1,
       "Glass": 1,
       "Compass": 1
     }
@@ -196,10 +165,7 @@
   "Zev": {
     "enchantments": {
       "Feather Falling IV": 1,
-      "Luck of the Sea II": 1,
-      "Punch II": 3,
       "Compass": 1
     }
   }
-
 }
