@@ -230,26 +230,38 @@ button {
       .replaceAll("'", "&#039;");
   }
 
-  function buildSign(villagerName, enchantmentName, options, isDuplicate) {
-    // Normalize enchantment name to a string
-    let enchantStr;
+  function buildSign(villagerName, enchantments, options, isDuplicate) {
+    // Normalize enchantments into a flat list of strings
+    let enchList = [];
 
-    if (typeof enchantmentName === "string") {
-      enchantStr = enchantmentName;
-    } else if (Array.isArray(enchantmentName)) {
-      enchantStr = enchantmentName[0];
-    } else if (typeof enchantmentName === "object" && enchantmentName !== null) {
-      enchantStr = Object.keys(enchantmentName)[0];
-    } else {
-      enchantStr = String(enchantmentName);
+    if (typeof enchantments === "string") {
+      enchList = [enchantments];
+    } else if (Array.isArray(enchantments)) {
+      enchList = enchantments.slice();
+    } else if (enchantments && typeof enchantments === "object") {
+      enchList = Object.keys(enchantments);
+    } else if (enchantments != null) {
+      enchList = [String(enchantments)];
     }
 
-    const duplicateLine = isDuplicate ? "§cDUPLICATE\n" : "";
-    const title = `§6${enchantStr.toUpperCase()}`;
-    const opts  = `§b${options.join(" | ")}`;
+    enchList = enchList
+      .map(s => (s ?? "").toString().trim())
+      .filter(Boolean);
 
-    return `${duplicateLine}${title}\n${opts}`;
+    const duplicateLine = isDuplicate ? "§cDUPLICATE\n" : "";
+
+    // Each enchantment on its own line
+    const enchLines = enchList.length
+      ? enchList.map(e => `§6${e.toUpperCase()}`).join("\n")
+      : "§6(NO COST==1 GOAL ENCHANTS)";
+
+    const optsLine = options && options.length
+      ? `§b${options.join(" | ")}`
+      : `§b(no add-ons)`;
+
+    return `${duplicateLine}${enchLines}\n${optsLine}`;
   }
+
 
 
   // ----- Compute cost==1 coverage for goals (BigInt masks) -----
