@@ -114,11 +114,11 @@
 
 <div class="panel grid">
   <div>
-    <div class="muted">Best set (minimum villagers covering all cost==1 obtainable goal enchants)</div>
+    <div class="muted">Best set (minimum villagers covering all cost==1 obtainable master-goal enchants)</div>
     <div id="bestSet"></div>
   </div>
   <div>
-    <div class="muted">Missing enchantments (no cost==1 source exists)</div>
+    <div class="muted">Missing enchantments (compared to master list)</div>
     <div id="missingList"></div>
   </div>
   <div>
@@ -144,7 +144,7 @@
 <script>
 (() => {
   // Fixed local files (NOT user-selectable)
-  const VILLAGERS_JSON = "./Pixel_Pioneers_Gesh.json";
+  const VILLAGERS_JSON = "./rebirth_rock.json";
   const ENCHANTMENTS_JSON = "./enchantments.json";
 
   // Safe aliases (single-level or common "I" formatting)
@@ -349,15 +349,62 @@
   }
 
   // ----- Rendering -----
-  function renderOptimizationPanels(villagers, goalList) {
-    const { villagerMasks, obtainableMask, missing } = computeCost1Coverage(villagers, goalList);
+  // Optimization: ignore non-cost==1 by only optimizing over master enchants that are obtainable at cost==1.
+  // Missing panel: compare what villagers have vs full master list.
+  function renderOptimizationPanels(villagers, masterGoalList, addonList) {
+    const addonSet = new Set(addonList);
+
+    // What your villagers have
+    const availableAny = new Set();    // exists at any cost
+    const availableCost1 = new Set();  // exists at cost==1
+
+    for (const v of Object.values(villagers)) {
+      const enchRaw = v.enchantments || {};
+      for (const [k, val] of Object.entries(enchRaw)) {
+        const nk = normalize(k);
+        if (addonSet.has(nk)) continue; // ignore add-ons
+        const p = priceFor(v, val);
+        availableAny.add(nk);
+        if (p === 1) availableCost1.add(nk);
+      }
+    }
+
+    const master = [...masterGoalList].sort((a,b)=>a.localeCompare(b));
+
+    // Missing vs the full master list
+    const missingEntirely = master.filter(e => !availableAny.has(e));
+    const missingCost1 = master.filter(e => !availableCost1.has(e));
+
+    // Render missing panel
+    if (!missingEntirely.length && !missingCost1.length) {
+      $("missingList").innerHTML = `<span class="ok">None</span>`;
+    } else {
+      const parts = [];
+      if (missingEntirely.length) {
+        parts.push(`<div class="muted">Missing entirely (no villager sells it at any cost):</div>`);
+        parts.push(missingEntirely.map(e => pillHTML(e, false)).join(" "));
+      } else {
+        parts.push(`<div class="muted">Missing entirely:</div><span class="ok">None</span>`);
+      }
+
+      parts.push(`<div style="height:10px"></div>`);
+
+      if (missingCost1.length) {
+        parts.push(`<div class="muted">Missing at cost==1:</div>`);
+        parts.push(missingCost1.map(e => pillHTML(e, false)).join(" "));
+      } else {
+        parts.push(`<div class="muted">Missing at cost==1:</div><span class="ok">None</span>`);
+      }
+
+      $("missingList").innerHTML = parts.join("");
+    }
+
+    // Optimization universe: ONLY master goals that exist at cost==1 in your village
+    const optimizationGoals = master.filter(e => availableCost1.has(e));
+
+    const { villagerMasks, obtainableMask } = computeCost1Coverage(villagers, optimizationGoals);
     const best = solveMinSetCoverExact(villagerMasks, obtainableMask) || [];
     const bestSet = new Set(best);
-
-    // Missing
-    $("missingList").innerHTML = missing.length
-      ? missing.map(e => pillHTML(e, false)).join(" ")
-      : `<span class="ok">None</span>`;
 
     // Best set
     if (!best.length) {
@@ -371,13 +418,14 @@
       $("bestSet").innerHTML = `<div class="muted">Count: <b>${best.length}</b></div>` + lines.join("");
     }
 
-    // Extraneous
+    // Extraneous (relative to this optimization)
     const extras = Object.keys(villagers)
       .filter(n => !bestSet.has(n))
       .sort((a,b)=>a.localeCompare(b));
 
     $("extrasList").innerHTML = extras.length
-      ? `<div class="muted">Count: <b>${extras.length}</b></div>` + extras.map(n => `<span class="pill">${escapeHtml(n)}</span>`).join(" ")
+      ? `<div class="muted">Count: <b>${extras.length}</b></div>` +
+        extras.map(n => `<span class="pill">${escapeHtml(n)}</span>`).join(" ")
       : `<span class="ok">None</span>`;
 
     return bestSet; // for table badges
@@ -502,17 +550,20 @@
 
       _villagers = villagers;
 
+      // Master goal list (for table classification and for missing-vs-master comparison)
       _goalList = (master.villager_enchantments || [])
         .filter(e => e && e.active !== false && typeof e.name === "string")
         .map(e => e.name.trim())
         .filter(Boolean)
         .sort((a,b)=>a.localeCompare(b));
 
+      // Add-ons (non-enchantment items)
       _addonList = Array.isArray(master.non_enchantments)
         ? master.non_enchantments.map(s => normalize(s)).filter(Boolean).sort((a,b)=>a.localeCompare(b))
         : [];
 
-      _bestSet = renderOptimizationPanels(_villagers, _goalList);
+      // Optimization uses master goals filtered to "obtainable at cost==1 in your village"
+      _bestSet = renderOptimizationPanels(_villagers, _goalList, _addonList);
       renderTable(_villagers, _goalList, _addonList, _bestSet);
 
       // Wire inputs (search/filters) to rerender table only

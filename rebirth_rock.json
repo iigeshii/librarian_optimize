@@ -1,0 +1,288 @@
+{
+    "Magnus": {
+        "enchantments": {
+            "Mending": 1,
+            "Lantern": 1,
+            "Loyalty I": 1,
+            "Compass": 1
+        }
+    },
+    "Thaddeus": {
+        "enchantments": {
+            "Curse of Vanishing": 1,
+            "Lantern": 1,
+            "Clock": 1
+        }
+    },
+    "Cedric": {
+        "enchantments": {
+            "Unbreaking III": 1,
+            "Riptide I": 1,
+            "Glass": 1,
+            "Clock": 1
+        }
+    },
+    "Garrick": {
+        "enchantments": {
+            "Luck of the Sea III": 1,
+            "Punch I": 1,
+            "Curse of Binding": 7,
+            "Compass": 1
+        }
+    },
+    "Aldric": {
+        "enchantments": {
+            "Protection IV": 1,
+            "Curse of Vanishing": 1,
+            "Mending": 1,
+            "Compass": 1
+        }
+    },
+    "Corwin": {
+        "enchantments": {
+            "Aqua Affinity": 1,
+            "Impaling II": 1,
+            "Projectile Protection IV": 1,
+            "Compass": 1
+        }
+    },
+    "Percival": {
+        "enchantments": {
+            "Thorns III": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Silk Touch": 1
+        }
+    },
+    "Oren": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Lunge III": 1
+        }
+    },
+    "Matthias": {
+        "enchantments": {
+            "Aqua Affinity": 1,
+            "Curse of Vanishing": 11,
+            "Glass": 1,
+            "Compass": 1
+        }
+    },
+    "Lucas": {
+        "enchantments": {
+            "Density IV": 1,
+            "Lantern": 1,
+            "Curse of Binding": 1,
+            "Compass": 1
+        }
+    },
+    "Tobias": {
+        "enchantments": {
+            "Respiration III": 1,
+            "Bane of Arthropods III": 1,
+            "Glass": 1,
+            "Protection II": 1
+        }
+    },
+    "Alaric": {
+        "enchantments": {
+            "Unbreaking II": 1,
+            "Fire Protection IV": 1,
+            "Infinity": 1,
+            "Compass": 1
+        }
+    },
+    "Theon": {
+        "enchantments": {
+            "Feather Falling IV": 1,
+            "Respiration I": 1,
+            "Glass": 1,
+            "Fortune III": 15
+        }
+    },
+    "Hadrian": {
+        "enchantments": {
+            "Depth Strider III": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Compass": 1
+        }
+    },
+    "Bram": {
+        "enchantments": {
+            "Frost Walker II": 1,
+            "Lantern": 1,
+            "Piercing IV": 2,
+            "Clock": 1
+        }
+    },
+    "Calder": {
+        "enchantments": {
+            "Sharpness V": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Clock": 1
+        }
+    },
+    "Dorian": {
+        "enchantments": {
+            "Smite V": 1,
+            "Breach II": 1,
+            "Mending I": 1,
+            "Smite I": 1
+        }
+    },
+    "Fenric": {
+        "enchantments": {
+            "Looting III": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Aqua Affinity": 1
+        }
+    },
+    "Osric": {
+        "enchantments": {
+            "Fire Aspect II": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Clock": 1
+        }
+    },
+    "Rurik": {
+        "enchantments": {
+            "Knockback II": 1,
+            "Riptide I": 1,
+            "Unbreaking III": 1,
+            "Clock": 1
+        }
+    },
+    "Barrow": {
+        "enchantments": {
+            "Efficiency V": 1,
+            "Unbreaking II": 1,
+            "Lure II": 7,
+            "Clock": 1
+        }
+    },
+    "Zorren": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Silk Touch": 1,
+            "Efficiency II": 4,
+            "Multishot": 1
+        }
+    },
+    "Xander": {
+        "enchantments": {
+            "Fortune III": 1,
+            "Sharpness I": 1,
+            "Glass": 1,
+            "Compass": 1
+        }
+    },
+    "Ansel": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Power V": 1,
+            "Fire Protection I": 1,
+            "Compass": 1
+        }
+    },
+    "Rowen": {
+        "enchantments": {
+            "Punch II": 1,
+            "Multishot": 1,
+            "Piercing I": 1,
+            "Luck of the Sea I": 1
+        }
+    },
+    "Varren": {
+        "enchantments": {
+            "Flame": 1,
+            "Lantern": 1,
+            "Infinity": 1,
+            "Clock": 1
+        }
+    },
+    "Severin": {
+        "enchantments": {
+            "Infinity": 1,
+            "Density I": 1,
+            "Flame": 1,
+            "Blast Protection II": 1
+        }
+    },
+    "Ulric": {
+        "enchantments": {
+            "Multishot": 1,
+            "Fire Aspect II": 1,
+            "Glass": 1,
+            "Compass": 1
+        }
+    },
+    "Wilren": {
+        "enchantments": {
+            "Piercing IV": 1,
+            "Knockback II": 1,
+            "Glass": 1,
+            "Compass": 1
+        }
+    },
+    "Dominic": {
+        "enchantments": {
+            "Quick Charge III": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Compass": 1
+        }
+    },
+    "Eustace": {
+        "enchantments": {
+            "Impaling V": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Clock": 1
+        }
+    },
+    "Belmont": {
+        "enchantments": {
+            "Channeling": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Respiration I": 1
+        }
+    },
+    "Quillon": {
+        "enchantments": {
+            "Loyalty III": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Compass": 1
+        }
+    },
+    "Gregory": {
+        "enchantments": {
+            "Riptide III": 1,
+            "Frost Walker I": 13,
+            "Glass": 1,
+            "Knockback I": 1
+        }
+    },
+    "Isambard": {
+        "enchantments": {
+            "Infinity": 1,
+            "Density V": 1,
+            "Compass": 1
+        }
+    },
+    "Laurence": {
+        "enchantments": {
+            "Breach IV": 1,
+            "Bane of Arthropods III": 17,
+            "Glass": 1,
+            "Aqua Affinity": 1
+        }
+    }
+}
