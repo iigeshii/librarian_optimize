@@ -175,10 +175,17 @@
     return null;
   }
 
-  function bitCount32(x) {
-    x = x - ((x >>> 1) & 0x55555555);
-    x = (x & 0x33333333) + ((x >>> 2) & 0x33333333);
-    return (((x + (x >>> 4)) & 0x0F0F0F0F) * 0x01010101) >>> 24;
+  // ---- BigInt helpers (fix 32-bit mask limit) ----
+  function bitCountBig(m) {
+    let c = 0;
+    while (m) { c++; m &= (m - 1n); }
+    return c;
+  }
+  function tzBig(lsb) {
+    // trailing zeros for a power-of-two BigInt
+    let z = 0;
+    while ((lsb >> BigInt(z)) !== 1n) z++;
+    return z;
   }
 
   async function loadJSON(path) {
@@ -210,18 +217,18 @@
     return [line1, line2, line3, line4].join("\n");
   }
 
-  // ----- Compute cost==1 coverage for goals -----
+  // ----- Compute cost==1 coverage for goals (BigInt masks) -----
   function computeCost1Coverage(villagers, goals) {
     const goalList = [...goals].sort((a,b)=>a.localeCompare(b));
     const idx = new Map(goalList.map((g,i)=>[g,i]));
 
-    const villagerMasks = []; // {name, mask, covers:[...]}
-    let obtainableMask = 0;
+    const villagerMasks = []; // {name, mask(BigInt), covers:[...]}
+    let obtainableMask = 0n;
 
     for (const name of Object.keys(villagers).sort((a,b)=>a.localeCompare(b))) {
       const v = villagers[name];
       const enchRaw = v.enchantments || {};
-      let mask = 0;
+      let mask = 0n;
       const covers = [];
 
       for (const g of goalList) {
@@ -239,37 +246,37 @@
 
         if (p === 1) {
           const bit = idx.get(g);
-          mask |= (1 << bit);
+          mask |= (1n << BigInt(bit));
           covers.push(g);
         }
       }
 
-      if (mask !== 0) {
+      if (mask !== 0n) {
         villagerMasks.push({ name, mask, covers: covers.sort((a,b)=>a.localeCompare(b)) });
         obtainableMask |= mask;
       }
     }
 
-    const obtainable = goalList.filter(g => ((obtainableMask >> idx.get(g)) & 1) === 1);
-    const missing = goalList.filter(g => ((obtainableMask >> idx.get(g)) & 1) === 0);
+    const obtainable = goalList.filter(g => ((obtainableMask >> BigInt(idx.get(g))) & 1n) === 1n);
+    const missing = goalList.filter(g => ((obtainableMask >> BigInt(idx.get(g))) & 1n) === 0n);
 
     return { goalList, idx, villagerMasks, obtainableMask, obtainable, missing };
   }
 
-  // ----- Exact minimum set cover (branch & bound) -----
+  // ----- Exact minimum set cover (branch & bound) using BigInt masks -----
   function solveMinSetCoverExact(villagerMasks, targetMask) {
-    if (targetMask === 0) return [];
+    if (targetMask === 0n) return [];
 
-    const items = [...villagerMasks].sort((a,b)=>bitCount32(b.mask) - bitCount32(a.mask));
-    const maxCover = items.length ? bitCount32(items[0].mask) : 0;
+    const items = [...villagerMasks].sort((a,b)=>bitCountBig(b.mask) - bitCountBig(a.mask));
+    const maxCover = items.length ? bitCountBig(items[0].mask) : 0;
     if (maxCover === 0) return null;
 
-    const bitToItems = new Map();
+    const bitToItems = new Map(); // bit(number) -> [itemIndex]
     for (let i = 0; i < items.length; i++) {
       let m = items[i].mask;
       while (m) {
-        const lsb = m & -m;
-        const bit = (Math.log2(lsb) | 0);
+        const lsb = m & (-m);
+        const bit = tzBig(lsb);
         if (!bitToItems.has(bit)) bitToItems.set(bit, []);
         bitToItems.get(bit).push(i);
         m ^= lsb;
@@ -282,7 +289,7 @@
       while (rem) {
         let best = -1, bestGain = 0;
         for (let i = 0; i < items.length; i++) {
-          const gain = bitCount32(items[i].mask & rem);
+          const gain = bitCountBig(items[i].mask & rem);
           if (gain > bestGain) { bestGain = gain; best = i; }
         }
         if (best < 0 || bestGain === 0) return null;
@@ -300,8 +307,8 @@
       let mm = remMask;
       let bestBit = null, bestCount = 1e9;
       while (mm) {
-        const lsb = mm & -mm;
-        const bit = (Math.log2(lsb) | 0);
+        const lsb = mm & (-mm);
+        const bit = tzBig(lsb);
         const c = (bitToItems.get(bit) || []).length;
         if (c < bestCount) {
           bestCount = c;
@@ -324,7 +331,7 @@
       if (chosen.length >= bestLen) return;
 
       const remaining = targetMask & ~covered;
-      const remBits = bitCount32(remaining);
+      const remBits = bitCountBig(remaining);
       const lower = Math.ceil(remBits / maxCover);
       if (chosen.length + lower >= bestLen) return;
 
@@ -333,7 +340,7 @@
 
       const candidates = (bitToItems.get(bit) || [])
         .slice()
-        .sort((i,j) => bitCount32(items[j].mask & remaining) - bitCount32(items[i].mask & remaining));
+        .sort((i,j) => bitCountBig(items[j].mask & remaining) - bitCountBig(items[i].mask & remaining));
 
       for (const i of candidates) {
         const newCovered = covered | items[i].mask;
@@ -342,7 +349,7 @@
       }
     }
 
-    dfs([], 0);
+    dfs([], 0n);
 
     if (!best) return null;
     return best.map(i => items[i].name);

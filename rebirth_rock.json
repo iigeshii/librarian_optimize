@@ -284,5 +284,21 @@
             "Glass": 1,
             "Aqua Affinity": 1
         }
+    },
+    "Reginald": {
+        "enchantments": {
+            "Bane of Arthropods V": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Block": 1
+        }
+    },
+    "Oswald": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Breach IV": 1,
+            "Lunge III": 1,
+            "Compass": 1
+        }
     }
 }
