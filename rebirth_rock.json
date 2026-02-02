@@ -316,5 +316,21 @@
             "Curse of Binding": 1,
             "Clock": 1
         }
+    },
+    "Urban": {
+        "enchantments": {
+            "Curse of Binding": 1,
+            "Breach IV": 1,
+            "Glass": 1,
+            "Multishot": 1
+        }
+    },
+    "Stephen": {
+        "enchantments": {
+            "Bane of Arthropods II": 2,
+            "Lantern": 1,
+            "Lure III": 1,
+            "Fire Aspect II": 7
+        }
     }
 }

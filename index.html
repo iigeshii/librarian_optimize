@@ -230,15 +230,26 @@ button {
       .replaceAll("'", "&#039;");
   }
 
-  function buildSign(name, goalCost1Names, addonNames) {
-    const line1 = `§b${name}`;
-    const top = goalCost1Names.slice(0, 2).join(" | ");
-    const rest = goalCost1Names.slice(2, 6).join(", ");
-    const line2 = top ? `§f${top}` : "§7NO $1 GOALS";
-    const line3 = rest ? `§7${rest}` : "§8";
-    const line4 = addonNames.length ? `§e${addonNames.slice(0, 3).join(" ")}` : "§8";
-    return [line1, line2, line3, line4].join("\n");
+  function buildSign(villagerName, enchantmentName, options) {
+    // Normalize enchantment name to a string
+    let enchantStr;
+
+    if (typeof enchantmentName === "string") {
+      enchantStr = enchantmentName;
+    } else if (Array.isArray(enchantmentName)) {
+      enchantStr = enchantmentName[0];
+    } else if (typeof enchantmentName === "object" && enchantmentName !== null) {
+      enchantStr = Object.keys(enchantmentName)[0];
+    } else {
+      enchantStr = String(enchantmentName);
+    }
+
+    const title = `§6${enchantStr.toUpperCase()}`;
+    const opts  = `§b${options.join(" | ")}`;
+
+    return `${title}\n${opts}`;
   }
+
 
   // ----- Compute cost==1 coverage for goals (BigInt masks) -----
   function computeCost1Coverage(villagers, goals) {
