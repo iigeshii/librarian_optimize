@@ -230,7 +230,7 @@ button {
       .replaceAll("'", "&#039;");
   }
 
-  function buildSign(villagerName, enchantmentName, options) {
+  function buildSign(villagerName, enchantmentName, options, isDuplicate) {
     // Normalize enchantment name to a string
     let enchantStr;
 
@@ -244,10 +244,11 @@ button {
       enchantStr = String(enchantmentName);
     }
 
+    const duplicateLine = isDuplicate ? "§cDUPLICATE\n" : "";
     const title = `§6${enchantStr.toUpperCase()}`;
     const opts  = `§b${options.join(" | ")}`;
 
-    return `${title}\n${opts}`;
+    return `${duplicateLine}${title}\n${opts}`;
   }
 
 
@@ -522,7 +523,10 @@ button {
       if (searchTerm && !blob.includes(searchTerm)) continue;
 
       const goalCost1 = goalEnchants.filter(e => e.price === 1).map(e => e.name);
-      const sign = buildSign(name, goalCost1, addons);
+
+      // Mark as duplicate if villager is in extraneous list (i.e., not in bestSet)
+      const isDuplicate = !bestSet.has(name);
+      const sign = buildSign(name, goalCost1, addons, isDuplicate);
 
       const tr = document.createElement("tr");
 
