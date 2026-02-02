@@ -300,5 +300,21 @@
             "Lunge III": 1,
             "Compass": 1
         }
+    },
+    "Harold": {
+        "enchantments": {
+            "Channeling": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Fortune III": 1
+        }
+    },
+    "Edmund": {
+        "enchantments": {
+            "Fortune III": 1,
+            "Lantern": 1,
+            "Curse of Binding": 1,
+            "Clock": 1
+        }
     }
 }

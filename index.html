@@ -46,7 +46,16 @@
     border-radius: 8px;
     min-width: 260px;
   }
-  button {
+  
+  select {
+    background: #0b0f14;
+    color: #e7eef7;
+    border: 1px solid #223044;
+    padding: 8px 10px;
+    border-radius: 8px;
+    min-width: 260px;
+  }
+button {
     background: #1d2a3c;
     color: #e7eef7;
     border: 1px solid #2b3f5d;
@@ -100,17 +109,7 @@
 <body>
 <h1>Villager Planner — Cost == 1 Only</h1>
 
-<div class="panel">
-  <div class="row">
-    <label>Search:
-      <input id="search" type="text" placeholder="villager or enchant…" />
-    </label>
-    <label><input id="onlyGoal" type="checkbox" checked> goal enchants only</label>
-    <label><input id="onlyCost1" type="checkbox"> cost==1 only</label>
-    <button id="reloadBtn">Reload JSON</button>
-  </div>
-  <div class="muted" id="status">Idle</div>
-</div>
+
 
 <div class="panel grid">
   <div>
@@ -125,6 +124,26 @@
     <div class="muted">Extraneous villagers</div>
     <div id="extrasList"></div>
   </div>
+</div>
+
+<div class="panel">
+  <div class="row">
+    <label>Villager file:
+      <select id="villagerFile">
+        <option value="./rebirth_rock.json">Rebirth Rock</option>
+        <option value="./donut_island_trading_hall.json">Donut Island Trading Hall</option>
+      </select>
+    </label>
+    <label>Search:
+      <input id="search" type="text" placeholder="villager or enchant…" />
+    </label>
+    <label><input id="onlyGoal" type="checkbox" checked> goal enchants only</label>
+    <label><input id="onlyCost1" type="checkbox"> cost==1 only</label>
+    <button id="reloadBtn">Reload</button>
+  </div>
+  <div class="muted" id="status">Idle</div>
+</div>
+
 </div>
 
 <div class="panel">
@@ -143,9 +162,13 @@
 
 <script>
 (() => {
-  // Fixed local files (NOT user-selectable)
-  const VILLAGERS_JSON = "./rebirth_rock.json";
+  // Fixed local files (dropdown is a fixed allow-list, NOT user-provided)
   const ENCHANTMENTS_JSON = "./enchantments.json";
+
+  function currentVillagersPath() {
+    const sel = $("villagerFile");
+    return (sel && sel.value) ? sel.value : "./rebirth_rock.json";
+  }
 
   // Safe aliases (single-level or common "I" formatting)
   const ALIASES = {
@@ -538,7 +561,8 @@
       shown++;
     }
 
-    $("status").innerHTML = `<span class="ok">Loaded</span> — showing ${shown} / ${names.length} villagers`;
+    const srcLabel = ($("villagerFile")?.selectedOptions?.[0]?.textContent || "Villagers").trim();
+    $("status").innerHTML = `<span class="ok">Loaded</span> — ${escapeHtml(srcLabel)} — showing ${shown} / ${names.length} villagers`;
   }
 
   // ----- App state -----
@@ -551,7 +575,7 @@
     try {
       $("status").textContent = "Loading…";
       const [villagers, master] = await Promise.all([
-        loadJSON(VILLAGERS_JSON),
+        loadJSON(currentVillagersPath()),
         loadJSON(ENCHANTMENTS_JSON)
       ]);
 
@@ -589,6 +613,8 @@
   }
 
   $("reloadBtn").addEventListener("click", reload);
+  const vf = $("villagerFile");
+  if (vf) vf.addEventListener("change", reload);
   reload();
 })();
 </script>
