@@ -6,163 +6,311 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-  body {
-    margin: 0;
-    padding: 16px;
-    background: #0b0f14;
-    color: #e7eef7;
-    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  :root{
+    --bg:#0b0f14;
+    --panel:#121a24;
+    --panel2:#0f1722;
+    --border:#223044;
+    --border2:#2b3f5d;
+    --text:#e7eef7;
+    --muted:#a9b7c9;
+    --ok:#8ee5a1;
+    --bad:#ff9aa5;
+    --pillCost1:#2c6b3f;
+    --pillCostN:#5d3b2b;
   }
-  h1 { margin: 0 0 12px; font-size: 20px; }
-  .panel {
-    background: #121a24;
-    border: 1px solid #223044;
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 12px;
-  }
-  .row {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-    align-items: center;
-  }
-  .grid {
-    display: grid;
-    gap: 12px;
-  }
-  @media (min-width: 1000px) {
-    .grid { grid-template-columns: 1fr 1fr 1fr; }
-  }
-  .muted { color: #a9b7c9; font-size: 12px; }
-  .ok { color: #8ee5a1; }
-  .error { color: #ff9aa5; }
 
-  input[type="text"] {
-    background: #0b0f14;
-    color: #e7eef7;
-    border: 1px solid #223044;
-    padding: 8px 10px;
-    border-radius: 8px;
-    min-width: 260px;
+  *{ box-sizing:border-box; }
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
   }
-  
-  select {
-    background: #0b0f14;
-    color: #e7eef7;
-    border: 1px solid #223044;
-    padding: 8px 10px;
-    border-radius: 8px;
-    min-width: 260px;
-  }
-button {
-    background: #1d2a3c;
-    color: #e7eef7;
-    border: 1px solid #2b3f5d;
-    padding: 8px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-  }
-  button:hover { background: #22344c; }
 
-  table { width: 100%; border-collapse: collapse; }
-  th, td {
-    border-bottom: 1px solid #223044;
-    padding: 10px;
-    vertical-align: top;
+  /* Sticky header */
+  header{
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:rgba(11,15,20,.92);
+    backdrop-filter: blur(8px);
+    border-bottom:1px solid var(--border);
   }
-  th {
-    position: sticky;
-    top: 0;
-    background: #121a24;
-    color: #cfe2ff;
-    text-align: left;
+  .wrap{ max-width:1200px; margin:0 auto; padding:16px; }
+
+  h1{ margin:0; font-size:20px; letter-spacing:.2px; }
+  .sub{ margin-top:6px; color:var(--muted); font-size:12px; }
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
   }
-  .pill {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 999px;
-    border: 1px solid #2b3f5d;
-    margin: 2px 6px 2px 0;
-    font-size: 12px;
-    white-space: nowrap;
+
+  .controls{
+    margin-top:12px;
+    display:flex;
+    gap:12px;
+    flex-wrap:wrap;
+    align-items:flex-end;
   }
-  .cost1 { border-color: #2c6b3f; }
-  .costN { border-color: #5d3b2b; }
-  .mono {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    font-size: 12px;
-    white-space: pre;
+  .control{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    min-width:220px;
   }
-  .tag {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 8px;
-    border: 1px solid #2b3f5d;
-    font-size: 12px;
-    margin-left: 8px;
+  label{ font-size:12px; color:var(--muted); }
+  input[type="text"], select{
+    width:100%;
+    background:var(--bg);
+    color:var(--text);
+    border:1px solid var(--border);
+    padding:9px 10px;
+    border-radius:10px;
+    outline:none;
   }
-  .tag.best { border-color: #2c6b3f; }
+  input[type="text"]:focus, select:focus{
+    border-color:#3a5276;
+  }
+
+  .toggles{
+    display:flex;
+    gap:10px;
+    align-items:center;
+    padding-bottom:2px;
+    min-width:260px;
+  }
+  .toggle{
+    display:flex;
+    gap:8px;
+    align-items:center;
+    font-size:13px;
+    color:var(--text);
+  }
+  .toggle input{ transform: translateY(1px); }
+
+  button{
+    background:#1d2a3c;
+    color:var(--text);
+    border:1px solid var(--border2);
+    padding:9px 12px;
+    border-radius:10px;
+    cursor:pointer;
+    font-weight:600;
+  }
+  button:hover{ background:#22344c; }
+
+  .status{
+    margin-top:10px;
+    font-size:12px;
+    color:var(--muted);
+  }
+  .ok{ color:var(--ok); }
+  .error{ color:var(--bad); }
+
+  /* Summary cards */
+  main{ max-width:1200px; margin:0 auto; padding:16px; display:flex; flex-direction:column; gap:12px; }
+  .summaryGrid{
+    display:grid;
+    gap:12px;
+  }
+  @media(min-width:1000px){
+    .summaryGrid{ grid-template-columns: 1fr 1fr 1fr; }
+  }
+  .card{
+    padding:12px;
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:12px;
+    min-height:110px;
+  }
+  .cardTitle{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    font-size:12px;
+    color:var(--muted);
+    margin-bottom:8px;
+  }
+  .countBadge{
+    font-size:12px;
+    color:var(--text);
+    border:1px solid var(--border2);
+    background:var(--panel2);
+    padding:2px 8px;
+    border-radius:999px;
+    white-space:nowrap;
+  }
+
+  .pill{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:999px;
+    border:1px solid var(--border2);
+    margin:2px 6px 2px 0;
+    font-size:12px;
+    white-space:nowrap;
+  }
+  .cost1{ border-color:var(--pillCost1); }
+  .costN{ border-color:var(--pillCostN); }
+  .tag{
+    display:inline-block;
+    padding:2px 8px;
+    border-radius:999px;
+    border:1px solid var(--border2);
+    font-size:12px;
+    margin-left:8px;
+    background:var(--panel2);
+  }
+  .tag.best{ border-color:var(--pillCost1); }
+  .tag.dup{ border-color:var(--bad); color:var(--bad); }
+
+  .mono{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:12px;
+    white-space:pre-wrap; /* wrap nicely */
+    word-break:break-word;
+    background:var(--panel2);
+    border:1px solid var(--border);
+    border-radius:10px;
+    padding:10px;
+    margin:0;
+  }
+
+  /* Desktop table */
+  .tableWrap{
+    overflow:auto;
+    border-radius:12px;
+  }
+  table{ width:100%; border-collapse:collapse; min-width:900px; }
+  th, td{ border-bottom:1px solid var(--border); padding:12px; vertical-align:top; }
+  th{
+    position:sticky;
+    top:0;
+    background:var(--panel);
+    color:#cfe2ff;
+    text-align:left;
+  }
+
+  /* Mobile cards */
+  .villagerCards{ display:none; gap:12px; }
+  .villagerCard{
+    padding:12px;
+    border:1px solid var(--border);
+    border-radius:12px;
+    background:var(--panel);
+  }
+  .vcHeader{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:10px;
+    margin-bottom:10px;
+  }
+  .vcName{ font-weight:800; }
+  .vcSectionTitle{ color:var(--muted); font-size:12px; margin:10px 0 6px; }
+  .vcActions{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+
+  @media(max-width: 980px){
+    .tableWrap{ display:none; }
+    .villagerCards{ display:grid; }
+  }
 </style>
 </head>
 
 <body>
-<h1>Villager Planner — Cost == 1 Only</h1>
 
+<header>
+  <div class="wrap">
+    <h1>Villager Planner — Cost == 1 Only</h1>
+    <div class="sub">Find the minimum set of villagers that covers all cost==1 goal enchants, and generate sign text.</div>
 
+    <div class="controls">
+      <div class="control">
+        <label for="villagerFile">Villager file</label>
+        <select id="villagerFile">
+          <option value="./rebirth_rock.json">Rebirth Rock</option>
+          <option value="./donut_island_trading_hall.json">Donut Island Trading Hall</option>
+        </select>
+      </div>
 
-<div class="panel grid">
-  <div>
-    <div class="muted">Best set (minimum villagers covering all cost==1 obtainable master-goal enchants)</div>
-    <div id="bestSet"></div>
+      <div class="control" style="flex:1; min-width:260px">
+        <label for="search">Search</label>
+        <input id="search" type="text" placeholder="villager or enchant…" />
+      </div>
+
+      <div class="toggles panel" style="padding:10px 12px; border-radius:12px;">
+        <label class="toggle" title="Hide non-goal enchants in the display">
+          <input id="onlyGoal" type="checkbox" checked>
+          goal enchants only
+        </label>
+        <label class="toggle" title="Show only enchants priced at 1 emerald (pre/post-cure logic still applies)">
+          <input id="onlyCost1" type="checkbox">
+          cost==1 only
+        </label>
+      </div>
+
+      <div class="control" style="min-width:140px">
+        <label>&nbsp;</label>
+        <button id="reloadBtn">Reload</button>
+      </div>
+    </div>
+
+    <div class="status" id="status">Idle</div>
   </div>
-  <div>
-    <div class="muted">Missing enchantments (compared to master list)</div>
-    <div id="missingList"></div>
-  </div>
-  <div>
-    <div class="muted">Extraneous villagers</div>
-    <div id="extrasList"></div>
-  </div>
-</div>
+</header>
 
-<div class="panel">
-  <div class="row">
-    <label>Villager file:
-      <select id="villagerFile">
-        <option value="./rebirth_rock.json">Rebirth Rock</option>
-        <option value="./donut_island_trading_hall.json">Donut Island Trading Hall</option>
-      </select>
-    </label>
-    <label>Search:
-      <input id="search" type="text" placeholder="villager or enchant…" />
-    </label>
-    <label><input id="onlyGoal" type="checkbox" checked> goal enchants only</label>
-    <label><input id="onlyCost1" type="checkbox"> cost==1 only</label>
-    <button id="reloadBtn">Reload</button>
-  </div>
-  <div class="muted" id="status">Idle</div>
-</div>
+<main>
+  <section class="summaryGrid">
+    <div class="card">
+      <div class="cardTitle">
+        <span>Best set (minimum villagers covering all cost==1 obtainable goal enchants)</span>
+        <span class="countBadge" id="bestCount">0</span>
+      </div>
+      <div id="bestSet"></div>
+    </div>
 
-</div>
+    <div class="card">
+      <div class="cardTitle">
+        <span>Missing enchantments (vs master list)</span>
+        <span class="countBadge" id="missingCount">0</span>
+      </div>
+      <div id="missingList"></div>
+    </div>
 
-<div class="panel">
-  <table>
-    <thead>
-      <tr>
-        <th style="width:200px">Villager</th>
-        <th>Enchantments</th>
-        <th style="width:220px">Add-ons</th>
-        <th style="width:360px">Sign code</th>
-      </tr>
-    </thead>
-    <tbody id="tbody"></tbody>
-  </table>
-</div>
+    <div class="card">
+      <div class="cardTitle">
+        <span>Extraneous villagers (not in best set)</span>
+        <span class="countBadge" id="extrasCount">0</span>
+      </div>
+      <div id="extrasList"></div>
+    </div>
+  </section>
+
+  <!-- Desktop table -->
+  <section class="panel tableWrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:220px">Villager</th>
+          <th>Enchantments</th>
+          <th style="width:220px">Add-ons</th>
+          <th style="width:380px">Sign code</th>
+        </tr>
+      </thead>
+      <tbody id="tbody"></tbody>
+    </table>
+  </section>
+
+  <!-- Mobile cards -->
+  <section class="villagerCards" id="cards"></section>
+</main>
 
 <script>
 (() => {
-  // Fixed local files (dropdown is a fixed allow-list, NOT user-provided)
   const ENCHANTMENTS_JSON = "./enchantments.json";
 
   function currentVillagersPath() {
@@ -170,7 +318,6 @@ button {
     return (sel && sel.value) ? sel.value : "./rebirth_rock.json";
   }
 
-  // Safe aliases (single-level or common "I" formatting)
   const ALIASES = {
     "Aqua Affinity I": "Aqua Affinity",
     "Channeling I": "Channeling",
@@ -198,14 +345,12 @@ button {
     return null;
   }
 
-  // ---- BigInt helpers (fix 32-bit mask limit) ----
   function bitCountBig(m) {
     let c = 0;
     while (m) { c++; m &= (m - 1n); }
     return c;
   }
   function tzBig(lsb) {
-    // trailing zeros for a power-of-two BigInt
     let z = 0;
     while ((lsb >> BigInt(z)) !== 1n) z++;
     return z;
@@ -217,10 +362,6 @@ button {
     return r.json();
   }
 
-  function pillHTML(text, isCost1) {
-    return `<span class="pill ${isCost1 ? "cost1" : "costN"}">${escapeHtml(text)}</span>`;
-  }
-
   function escapeHtml(s) {
     return (s ?? "").toString()
       .replaceAll("&", "&amp;")
@@ -230,27 +371,21 @@ button {
       .replaceAll("'", "&#039;");
   }
 
+  function pillHTML(text, isCost1) {
+    return `<span class="pill ${isCost1 ? "cost1" : "costN"}">${escapeHtml(text)}</span>`;
+  }
+
   function buildSign(villagerName, enchantments, options, isDuplicate) {
-    // Normalize enchantments into a flat list of strings
     let enchList = [];
 
-    if (typeof enchantments === "string") {
-      enchList = [enchantments];
-    } else if (Array.isArray(enchantments)) {
-      enchList = enchantments.slice();
-    } else if (enchantments && typeof enchantments === "object") {
-      enchList = Object.keys(enchantments);
-    } else if (enchantments != null) {
-      enchList = [String(enchantments)];
-    }
+    if (typeof enchantments === "string") enchList = [enchantments];
+    else if (Array.isArray(enchantments)) enchList = enchantments.slice();
+    else if (enchantments && typeof enchantments === "object") enchList = Object.keys(enchantments);
+    else if (enchantments != null) enchList = [String(enchantments)];
 
-    enchList = enchList
-      .map(s => (s ?? "").toString().trim())
-      .filter(Boolean);
+    enchList = enchList.map(s => (s ?? "").toString().trim()).filter(Boolean);
 
     const duplicateLine = isDuplicate ? "§cDUPLICATE\n" : "";
-
-    // Each enchantment on its own line
     const enchLines = enchList.length
       ? enchList.map(e => `§6${e.toUpperCase()}`).join("\n")
       : "§6(NO COST==1 GOAL ENCHANTS)";
@@ -262,14 +397,11 @@ button {
     return `${duplicateLine}${enchLines}\n${optsLine}`;
   }
 
-
-
-  // ----- Compute cost==1 coverage for goals (BigInt masks) -----
   function computeCost1Coverage(villagers, goals) {
     const goalList = [...goals].sort((a,b)=>a.localeCompare(b));
     const idx = new Map(goalList.map((g,i)=>[g,i]));
 
-    const villagerMasks = []; // {name, mask(BigInt), covers:[...]}
+    const villagerMasks = [];
     let obtainableMask = 0n;
 
     for (const name of Object.keys(villagers).sort((a,b)=>a.localeCompare(b))) {
@@ -281,11 +413,9 @@ button {
       for (const g of goalList) {
         let p = null;
 
-        // direct key lookup
         if (Object.prototype.hasOwnProperty.call(enchRaw, g)) {
           p = priceFor(v, enchRaw[g]);
         } else {
-          // alias scan
           for (const [k,val] of Object.entries(enchRaw)) {
             if (normalize(k) === g) { p = priceFor(v, val); break; }
           }
@@ -304,13 +434,9 @@ button {
       }
     }
 
-    const obtainable = goalList.filter(g => ((obtainableMask >> BigInt(idx.get(g))) & 1n) === 1n);
-    const missing = goalList.filter(g => ((obtainableMask >> BigInt(idx.get(g))) & 1n) === 0n);
-
-    return { goalList, idx, villagerMasks, obtainableMask, obtainable, missing };
+    return { goalList, idx, villagerMasks, obtainableMask };
   }
 
-  // ----- Exact minimum set cover (branch & bound) using BigInt masks -----
   function solveMinSetCoverExact(villagerMasks, targetMask) {
     if (targetMask === 0n) return [];
 
@@ -318,7 +444,7 @@ button {
     const maxCover = items.length ? bitCountBig(items[0].mask) : 0;
     if (maxCover === 0) return null;
 
-    const bitToItems = new Map(); // bit(number) -> [itemIndex]
+    const bitToItems = new Map();
     for (let i = 0; i < items.length; i++) {
       let m = items[i].mask;
       while (m) {
@@ -402,21 +528,17 @@ button {
     return best.map(i => items[i].name);
   }
 
-  // ----- Rendering -----
-  // Optimization: ignore non-cost==1 by only optimizing over master enchants that are obtainable at cost==1.
-  // Missing panel: compare what villagers have vs full master list.
   function renderOptimizationPanels(villagers, masterGoalList, addonList) {
     const addonSet = new Set(addonList);
 
-    // What your villagers have
-    const availableAny = new Set();    // exists at any cost
-    const availableCost1 = new Set();  // exists at cost==1
+    const availableAny = new Set();
+    const availableCost1 = new Set();
 
     for (const v of Object.values(villagers)) {
       const enchRaw = v.enchantments || {};
       for (const [k, val] of Object.entries(enchRaw)) {
         const nk = normalize(k);
-        if (addonSet.has(nk)) continue; // ignore add-ons
+        if (addonSet.has(nk)) continue;
         const p = priceFor(v, val);
         availableAny.add(nk);
         if (p === 1) availableCost1.add(nk);
@@ -424,70 +546,88 @@ button {
     }
 
     const master = [...masterGoalList].sort((a,b)=>a.localeCompare(b));
-
-    // Missing vs the full master list
     const missingEntirely = master.filter(e => !availableAny.has(e));
     const missingCost1 = master.filter(e => !availableCost1.has(e));
 
-    // Render missing panel
+    // Missing panel + count
+    const missingCount = (missingEntirely.length + missingCost1.length);
+    $("missingCount").textContent = String(missingCount);
+
     if (!missingEntirely.length && !missingCost1.length) {
       $("missingList").innerHTML = `<span class="ok">None</span>`;
     } else {
       const parts = [];
       if (missingEntirely.length) {
-        parts.push(`<div class="muted">Missing entirely (no villager sells it at any cost):</div>`);
+        parts.push(`<div class="muted" style="margin-bottom:6px">Missing entirely</div>`);
         parts.push(missingEntirely.map(e => pillHTML(e, false)).join(" "));
       } else {
-        parts.push(`<div class="muted">Missing entirely:</div><span class="ok">None</span>`);
+        parts.push(`<div class="muted">Missing entirely</div><span class="ok">None</span>`);
       }
 
       parts.push(`<div style="height:10px"></div>`);
 
       if (missingCost1.length) {
-        parts.push(`<div class="muted">Missing at cost==1:</div>`);
+        parts.push(`<div class="muted" style="margin-bottom:6px">Missing at cost==1</div>`);
         parts.push(missingCost1.map(e => pillHTML(e, false)).join(" "));
       } else {
-        parts.push(`<div class="muted">Missing at cost==1:</div><span class="ok">None</span>`);
+        parts.push(`<div class="muted">Missing at cost==1</div><span class="ok">None</span>`);
       }
 
       $("missingList").innerHTML = parts.join("");
     }
 
-    // Optimization universe: ONLY master goals that exist at cost==1 in your village
     const optimizationGoals = master.filter(e => availableCost1.has(e));
-
     const { villagerMasks, obtainableMask } = computeCost1Coverage(villagers, optimizationGoals);
     const best = solveMinSetCoverExact(villagerMasks, obtainableMask) || [];
     const bestSet = new Set(best);
 
-    // Best set
+    $("bestCount").textContent = String(best.length);
+
     if (!best.length) {
       $("bestSet").innerHTML = `<span class="muted">(none)</span>`;
     } else {
       const lines = [];
       for (const name of best) {
         const covers = (villagerMasks.find(x => x.name === name)?.covers) || [];
-        lines.push(`<div><b>${escapeHtml(name)}</b>: ${covers.map(c => pillHTML(c, true)).join(" ")}</div>`);
+        lines.push(`<div style="margin-bottom:8px"><b>${escapeHtml(name)}</b>: ${covers.map(c => pillHTML(c, true)).join(" ")}</div>`);
       }
-      $("bestSet").innerHTML = `<div class="muted">Count: <b>${best.length}</b></div>` + lines.join("");
+      $("bestSet").innerHTML = lines.join("");
     }
 
-    // Extraneous (relative to this optimization)
     const extras = Object.keys(villagers)
       .filter(n => !bestSet.has(n))
       .sort((a,b)=>a.localeCompare(b));
 
+    $("extrasCount").textContent = String(extras.length);
+
     $("extrasList").innerHTML = extras.length
-      ? `<div class="muted">Count: <b>${extras.length}</b></div>` +
-        extras.map(n => `<span class="pill">${escapeHtml(n)}</span>`).join(" ")
+      ? extras.map(n => `<span class="pill">${escapeHtml(n)}</span>`).join(" ")
       : `<span class="ok">None</span>`;
 
-    return bestSet; // for table badges
+    return bestSet;
   }
 
-  function renderTable(villagers, goalList, addonList, bestSet) {
+  function makeCopyButton(text) {
+    const btn = document.createElement("button");
+    btn.textContent = "Copy";
+    btn.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(text);
+        btn.textContent = "Copied!";
+        setTimeout(() => (btn.textContent = "Copy"), 900);
+      } catch {
+        btn.textContent = "Clipboard blocked";
+        setTimeout(() => (btn.textContent = "Copy"), 1200);
+      }
+    });
+    return btn;
+  }
+
+  function renderTableAndCards(villagers, goalList, addonList, bestSet) {
     const tbody = $("tbody");
+    const cards = $("cards");
     tbody.innerHTML = "";
+    cards.innerHTML = "";
 
     const goalSet = new Set(goalList);
     const addonSet = new Set(addonList);
@@ -497,7 +637,6 @@ button {
     const onlyCost1 = $("onlyCost1").checked;
 
     const names = Object.keys(villagers).sort((a,b)=>a.localeCompare(b));
-
     let shown = 0;
 
     for (const name of names) {
@@ -524,7 +663,6 @@ button {
       let displayed = onlyGoal ? goalEnchants : goalEnchants.concat(otherEnchants);
       if (onlyCost1) displayed = displayed.filter(e => e.price === 1);
 
-      // Search blob includes villager name + all goal/other enchants + addons (not just displayed)
       const blob = [
         name,
         ...goalEnchants.map(e => `${e.name} ${e.price ?? ""}`),
@@ -535,15 +673,19 @@ button {
       if (searchTerm && !blob.includes(searchTerm)) continue;
 
       const goalCost1 = goalEnchants.filter(e => e.price === 1).map(e => e.name);
-
-      // Mark as duplicate if villager is in extraneous list (i.e., not in bestSet)
       const isDuplicate = !bestSet.has(name);
       const sign = buildSign(name, goalCost1, addons, isDuplicate);
 
+      // ---- Desktop row ----
       const tr = document.createElement("tr");
 
       const tdName = document.createElement("td");
-      tdName.innerHTML = `<b>${escapeHtml(name)}</b>` + (bestSet.has(name) ? ` <span class="tag best">BEST SET</span>` : ``);
+      const tags = [
+        bestSet.has(name) ? `<span class="tag best">BEST SET</span>` : ``,
+        isDuplicate ? `<span class="tag dup">DUPLICATE</span>` : ``
+      ].filter(Boolean).join(" ");
+
+      tdName.innerHTML = `<b>${escapeHtml(name)}</b> ${tags}`;
       tr.appendChild(tdName);
 
       const tdEnch = document.createElement("td");
@@ -566,25 +708,67 @@ button {
       const pre = document.createElement("pre");
       pre.className = "mono";
       pre.textContent = sign;
-      tdSign.appendChild(pre);
 
-      const btn = document.createElement("button");
-      btn.textContent = "Copy";
-      btn.style.marginTop = "6px";
-      btn.addEventListener("click", async () => {
-        try {
-          await navigator.clipboard.writeText(sign);
-          btn.textContent = "Copied!";
-          setTimeout(() => (btn.textContent = "Copy"), 900);
-        } catch {
-          btn.textContent = "Clipboard blocked";
-          setTimeout(() => (btn.textContent = "Copy"), 1200);
-        }
-      });
-      tdSign.appendChild(btn);
+      const actions = document.createElement("div");
+      actions.style.marginTop = "8px";
+      actions.appendChild(makeCopyButton(sign));
+
+      tdSign.appendChild(pre);
+      tdSign.appendChild(actions);
       tr.appendChild(tdSign);
 
       tbody.appendChild(tr);
+
+      // ---- Mobile card ----
+      const card = document.createElement("div");
+      card.className = "villagerCard";
+
+      const head = document.createElement("div");
+      head.className = "vcHeader";
+
+      const left = document.createElement("div");
+      left.innerHTML = `<div class="vcName">${escapeHtml(name)} ${
+        bestSet.has(name) ? `<span class="tag best">BEST SET</span>` : ``
+      } ${
+        isDuplicate ? `<span class="tag dup">DUPLICATE</span>` : ``
+      }</div>`;
+
+      const right = document.createElement("div");
+      right.className = "vcActions";
+      right.appendChild(makeCopyButton(sign));
+
+      head.appendChild(left);
+      head.appendChild(right);
+
+      const enchWrap = document.createElement("div");
+      enchWrap.innerHTML = `<div class="vcSectionTitle">Enchantments</div>` +
+        (displayed.length
+          ? displayed.map(e => {
+              const cls = (e.price === 1) ? "cost1" : "costN";
+              const p = (e.price === null || e.price === undefined) ? "?" : e.price;
+              return `<span class="pill ${cls}">${escapeHtml(e.name)} (${p})</span>`;
+            }).join("")
+          : `<span class="muted">(none)</span>`
+        );
+
+      const addWrap = document.createElement("div");
+      addWrap.innerHTML = `<div class="vcSectionTitle">Add-ons</div>` +
+        (addons.length ? escapeHtml(addons.join(", ")) : `<span class="muted">(none)</span>`);
+
+      const signWrap = document.createElement("div");
+      signWrap.innerHTML = `<div class="vcSectionTitle">Sign code</div>`;
+      const pre2 = document.createElement("pre");
+      pre2.className = "mono";
+      pre2.textContent = sign;
+
+      card.appendChild(head);
+      card.appendChild(enchWrap);
+      card.appendChild(addWrap);
+      card.appendChild(signWrap);
+      card.appendChild(pre2);
+
+      cards.appendChild(card);
+
       shown++;
     }
 
@@ -592,7 +776,6 @@ button {
     $("status").innerHTML = `<span class="ok">Loaded</span> — ${escapeHtml(srcLabel)} — showing ${shown} / ${names.length} villagers`;
   }
 
-  // ----- App state -----
   let _villagers = null;
   let _goalList = [];
   let _addonList = [];
@@ -608,26 +791,22 @@ button {
 
       _villagers = villagers;
 
-      // Master goal list (for table classification and for missing-vs-master comparison)
       _goalList = (master.villager_enchantments || [])
         .filter(e => e && e.active !== false && typeof e.name === "string")
         .map(e => e.name.trim())
         .filter(Boolean)
         .sort((a,b)=>a.localeCompare(b));
 
-      // Add-ons (non-enchantment items)
       _addonList = Array.isArray(master.non_enchantments)
         ? master.non_enchantments.map(s => normalize(s)).filter(Boolean).sort((a,b)=>a.localeCompare(b))
         : [];
 
-      // Optimization uses master goals filtered to "obtainable at cost==1 in your village"
       _bestSet = renderOptimizationPanels(_villagers, _goalList, _addonList);
-      renderTable(_villagers, _goalList, _addonList, _bestSet);
+      renderTableAndCards(_villagers, _goalList, _addonList, _bestSet);
 
-      // Wire inputs (search/filters) to rerender table only
       const rerender = () => {
         if (!_villagers) return;
-        renderTable(_villagers, _goalList, _addonList, _bestSet);
+        renderTableAndCards(_villagers, _goalList, _addonList, _bestSet);
       };
       $("search").oninput = rerender;
       $("onlyGoal").onchange = rerender;

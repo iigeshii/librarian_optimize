@@ -333,5 +333,13 @@
             "Lure III": 1,
             "Fire Aspect II": 7
         }
+    },
+    "Philip": {
+        "enchantments": {
+            "Blast Protection IV": 1,
+            "Lantern": 1,
+            "Feather Falling III": 1,
+            "Loyalty I": 1
+        }
     }
 }
