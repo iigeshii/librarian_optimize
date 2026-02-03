@@ -421,7 +421,7 @@
           }
         }
 
-        if (p !== null) {
+        if (p === 1) {
           const bit = idx.get(g);
           mask |= (1n << BigInt(bit));
           covers.push(g);
@@ -576,12 +576,9 @@
       $("missingList").innerHTML = parts.join("");
     }
 
-  // Optimization universe: master goals that exist at ANY cost in your village
-  const optimizationGoals = master.filter(e => availableAny.has(e));
-
-  const { villagerMasks, obtainableMask } = computeCost1Coverage(villagers, optimizationGoals);
-  const best = solveMinSetCoverExact(villagerMasks, obtainableMask) || [];
-
+    const optimizationGoals = master.filter(e => availableCost1.has(e));
+    const { villagerMasks, obtainableMask } = computeCost1Coverage(villagers, optimizationGoals);
+    const best = solveMinSetCoverExact(villagerMasks, obtainableMask) || [];
     const bestSet = new Set(best);
 
     $("bestCount").textContent = String(best.length);
