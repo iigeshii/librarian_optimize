@@ -125,5 +125,116 @@
             "Smite V": 22,
             "Compass": 1
         }
+    },
+    "Belmont": {
+        "enchantments": {
+            "Channeling": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Respiration I": 1
+        }
+    },
+    "Cedric": {
+        "enchantments": {
+            "Unbreaking III": 1,
+            "Riptide I": 1,
+            "Glass": 1,
+            "Clock": 1
+        }
+    },
+    "Edmund": {
+        "enchantments": {
+            "Fortune III": 1,
+            "Lantern": 1,
+            "Curse of Binding": 1,
+            "Clock": 1
+        }
+    },
+    "Laurence": {
+        "enchantments": {
+            "Breach IV": 1,
+            "Bane of Arthropods III": 17,
+            "Glass": 1,
+            "Aqua Affinity": 1
+        }
+    },
+    "Lucas": {
+        "enchantments": {
+            "Density IV": 1,
+            "Lantern": 1,
+            "Curse of Binding": 1,
+            "Compass": 1
+        }
+    },
+    "Magnus": {
+        "enchantments": {
+            "Mending": 1,
+            "Lantern": 1,
+            "Loyalty I": 1,
+            "Compass": 1
+        }
+    },
+    "Matthias": {
+        "enchantments": {
+            "Aqua Affinity": 1,
+            "Curse of Vanishing": 11,
+            "Glass": 1,
+            "Compass": 1
+        }
+    },
+    "Oren": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Lunge III": 1
+        }
+    },
+    "Osric": {
+        "enchantments": {
+            "Fire Aspect II": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Clock": 1
+        }
+    },
+    "Thaddeus": {
+        "enchantments": {
+            "Curse of Vanishing": 1,
+            "Lantern": 1,
+            "Clock": 1
+        }
+    },
+    "Varren": {
+        "enchantments": {
+            "Flame": 1,
+            "Lantern": 1,
+            "Infinity": 1,
+            "Clock": 1
+        }
+    },
+    "Xander": {
+        "enchantments": {
+            "Fortune III": 1,
+            "Sharpness I": 1,
+            "Glass": 1,
+            "Compass": 1
+        }
+    },
+    "Zorren": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Silk Touch": 1,
+            "Efficiency II": 4,
+            "Multishot": 1
+        }
+    },
+    "Sponsored Sharpness V": {
+        "enchantments": {
+            "Sharpness V": 1,
+            "Curse of Binding": 1,
+            "Respiration I": 1,
+            "Compass": 1
+        }
     }
 }
