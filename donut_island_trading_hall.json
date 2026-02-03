@@ -1,0 +1,129 @@
+{
+    "Poppy 1": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Looting I": 1,
+            "Unbreaking III": 1,
+            "Luck of the Sea III": 1
+        }
+    },
+    "Poppy 2": {
+        "enchantments": {
+            "Bane of Arthropods IV": 18,
+            "Respiration III": 1,
+            "Channeling": 1,
+            "Compass": 1
+        }
+    },
+    "Poppy 3": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Lantern": 1,
+            "Infinity": 1,
+            "Looting II": 1
+        }
+    },
+    "Poppy 4": {
+        "enchantments": {
+            "Impaling III": 13,
+            "Frost Walker I": 26,
+            "Feather Falling IV": 58
+        }
+    },
+    "Poppy 5": {
+        "enchantments": {
+            "Depth Strider III": 1,
+            "Lantern": 1,
+            "Glass": 1,
+            "Clock": 1
+        }
+    },
+    "Poppy 6": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Mending": 11,
+            "Silk Touch": 1,
+            "Aqua Affinity": 1
+        }
+    },
+    "Poppy 7": {
+        "enchantments": {
+            "Efficiency I": 1,
+            "Power V": 1,
+            "Sharpness V": 25,
+            "Density III": 13
+        }
+    },
+    "Poppy 8": {
+        "enchantments": {
+            "Looting III": 1,
+            "Lantern": 1,
+            "Riptide III": 8,
+            "Clock": 1
+        }
+    },
+    "Poppy 9": {
+        "enchantments": {
+            "Fire Protection I": 1,
+            "Loyalty III": 1,
+            "Glass": 1,
+            "Clock": 1
+        }
+    },
+    "Poppy 10": {
+        "enchantments": {
+            "Efficiency V": 17,
+            "Multishot": 1,
+            "Glass": 1,
+            "Clock": 1
+        }
+    },
+    "Poppy 11": {
+        "enchantments": {
+            "Fortune III": 5,
+            "Sharpness IV": 28,
+            "Glass": 1,
+            "Compass": 1
+        }
+    },
+    "Poppy 12": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Smite II": 1,
+            "Protection IV": 22,
+            "Flame": 1
+        }
+    },
+    "Poppy 13": {
+        "enchantments": {
+            "Fire Aspect II": 1,
+            "Smite III": 18,
+            "Glass": 1,
+            "Bane of Arthropods IV": 16
+        }
+    },
+    "Poppy 14": {
+        "enchantments": {
+            "Thorns III": 37,
+            "Lantern": 1,
+            "Frost Walker II": 30,
+            "Clock": 1
+        }
+    },
+    "Poppy 15": {
+        "enchantments": {
+            "Multishot": 19,
+            "Lantern": 1,
+            "Impaling V": 19
+        }
+    },
+    "Poppy 16": {
+        "enchantments": {
+            "Bane of Arthropods IV": 45,
+            "Aqua Affinity": 11,
+            "Smite I": 19,
+            "Smite V": 22,
+            "Compass": 1
+        }
+    }
+}
