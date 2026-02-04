@@ -318,6 +318,17 @@
     return (sel && sel.value) ? sel.value : "./rebirth_rock.json";
   }
 
+  function getFileFromURL() {
+    const p = new URLSearchParams(window.location.search);
+    return p.get("file"); // e.g. "./rebirth_rock.json" or "rebirth_rock.json"
+  }
+
+  function setFileInURL(value) {
+    const url = new URL(window.location.href);
+    url.searchParams.set("file", value);
+    history.replaceState(null, "", url.toString());
+  }
+
   const ALIASES = {
     "Aqua Affinity I": "Aqua Affinity",
     "Channeling I": "Channeling",
@@ -586,13 +597,30 @@
     if (!best.length) {
       $("bestSet").innerHTML = `<span class="muted">(none)</span>`;
     } else {
-      const lines = [];
-      for (const name of best) {
+      // Build rows with their already-sorted covers
+      const rows = best.map(name => {
         const covers = (villagerMasks.find(x => x.name === name)?.covers) || [];
-        lines.push(`<div style="margin-bottom:8px"><b>${escapeHtml(name)}</b>: ${covers.map(c => pillHTML(c, true)).join(" ")}</div>`);
-      }
+        return {
+          name,
+          covers,
+          first: (covers[0] || "\uffff").toString() // put "no covers" at end safely
+        };
+      });
+
+      // Sort villagers by first covered enchantment, then by villager name
+      rows.sort((a, b) => {
+        const c = a.first.localeCompare(b.first);
+        if (c !== 0) return c;
+        return a.name.localeCompare(b.name);
+      });
+
+      const lines = rows.map(r =>
+        `<div style="margin-bottom:8px"><b>${escapeHtml(r.name)}</b>: ${r.covers.map(c => pillHTML(c, true)).join(" ")}</div>`
+      );
+
       $("bestSet").innerHTML = lines.join("");
     }
+
 
     const extras = Object.keys(villagers)
       .filter(n => !bestSet.has(n))
@@ -819,9 +847,28 @@
   }
 
   $("reloadBtn").addEventListener("click", reload);
+
   const vf = $("villagerFile");
-  if (vf) vf.addEventListener("change", reload);
+  if (vf) {
+    // If URL has ?file=..., select it (if it exists in the dropdown)
+    const fromURL = getFileFromURL();
+    if (fromURL) {
+      const match = [...vf.options].find(o => o.value === fromURL);
+      if (match) vf.value = fromURL;
+    } else {
+      // No param yet -> write current default to URL
+      setFileInURL(vf.value);
+    }
+
+    // When user changes dropdown, persist in URL and reload
+    vf.addEventListener("change", () => {
+      setFileInURL(vf.value);
+      reload();
+    });
+  }
+
   reload();
+
 })();
 </script>
 

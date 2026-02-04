@@ -205,12 +205,12 @@
             "Clock": 1
         }
     },
-    "Varren": {
+    "Severin": {
         "enchantments": {
-            "Flame": 1,
-            "Lantern": 1,
             "Infinity": 1,
-            "Clock": 1
+            "Density I": 1,
+            "Flame": 1,
+            "Blast Protection II": 1
         }
     },
     "Xander": {
@@ -235,6 +235,45 @@
             "Curse of Binding": 1,
             "Respiration I": 1,
             "Compass": 1
+        }
+    },
+    "Elowen": {
+        "enchantments": {
+            "Luck of the Sea": 1,
+            "Lantern": 1,
+            "Piercing IV": 1,
+            "Depth Strider III": 1
+        }
+    },
+    "Florian": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Lantern": 1,
+            "Density V": 1,
+            "Clock": 1
+        }
+    },
+    "Sylvanus": {
+        "enchantments": {
+            "Protection IV": 1,
+            "Lure III": 1,
+            "Fire Protection III": 1
+        }
+    },
+    "Winona": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Fire Protection IV": 4,
+            "Mending": 1,
+            "Punch II": 1
+        }
+    },
+    "Maribel": {
+        "enchantments": {
+            "Bookshelf": 1,
+            "Aqua Affinity": 1,
+            "Channeling": 1,
+            "Knockback II": 1
         }
     }
 }
