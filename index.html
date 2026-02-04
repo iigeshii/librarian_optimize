@@ -318,6 +318,11 @@
     return (sel && sel.value) ? sel.value : "./rebirth_rock.json";
   }
 
+  function isDonutIsland() {
+    const p = currentVillagersPath().toLowerCase();
+    return p.includes("donut");
+  }
+
   function getFileFromURL() {
     const p = new URLSearchParams(window.location.search);
     return p.get("file"); // e.g. "./rebirth_rock.json" or "rebirth_rock.json"
@@ -386,26 +391,38 @@
     return `<span class="pill ${isCost1 ? "cost1" : "costN"}">${escapeHtml(text)}</span>`;
   }
 
-  function buildSign(villagerName, enchantments, options, isDuplicate) {
-    let enchList = [];
+  function buildSign(villagerName, cost1Enchants, costNEnchants, options, isDuplicate) {
+    const donut = isDonutIsland();
 
-    if (typeof enchantments === "string") enchList = [enchantments];
-    else if (Array.isArray(enchantments)) enchList = enchantments.slice();
-    else if (enchantments && typeof enchantments === "object") enchList = Object.keys(enchantments);
-    else if (enchantments != null) enchList = [String(enchantments)];
+    const colorCost1 = donut ? "§d" : "§6"; // pink / gold
+    const colorCostN = "§7";               // gray
+    const colorOpts  = donut ? "§b" : "§b"; // purple / aqua
 
-    enchList = enchList.map(s => (s ?? "").toString().trim()).filter(Boolean);
+    const lines = [];
 
-    const duplicateLine = isDuplicate ? "§cDUPLICATE\n" : "";
-    const enchLines = enchList.length
-      ? enchList.map(e => `§6${e.toUpperCase()}`).join("\n")
-      : "§6(NO COST==1 GOAL ENCHANTS)";
+    if (isDuplicate) {
+      lines.push("§cDUPLICATE");
+    }
+
+    if (cost1Enchants.length) {
+      cost1Enchants.forEach(e => lines.push(`${colorCost1}${e}`));
+    }
+
+    if (costNEnchants.length) {
+      costNEnchants.forEach(e => lines.push(`${colorCostN}${e}`));
+    }
+
+    if (!cost1Enchants.length && !costNEnchants.length) {
+      lines.push(`${colorCostN}(no goal enchants)`);
+    }
 
     const optsLine = options && options.length
-      ? `§b${options.join(" | ")}`
-      : `§b(no add-ons)`;
+      ? `${colorOpts}${options.join(" | ")}`
+      : `${colorOpts}(no add-ons)`;
 
-    return `${duplicateLine}${enchLines}\n${optsLine}`;
+    lines.push(optsLine);
+
+    return lines.join("\n");
   }
 
   function computeCost1Coverage(villagers, goals) {
@@ -700,9 +717,11 @@
 
       if (searchTerm && !blob.includes(searchTerm)) continue;
 
-      const goalCost1 = goalEnchants.filter(e => e.price === 1).map(e => e.name);
       const isDuplicate = !bestSet.has(name);
-      const sign = buildSign(name, goalCost1, addons, isDuplicate);
+      const goalCost1 = goalEnchants.filter(e => e.price === 1).map(e => e.name);
+      const goalCostN = goalEnchants.filter(e => e.price !== 1).map(e => e.name);
+
+      const sign = buildSign(name, goalCost1, goalCostN, addons, isDuplicate);
 
       // ---- Desktop row ----
       const tr = document.createElement("tr");
