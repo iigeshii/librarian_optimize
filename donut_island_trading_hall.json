@@ -1,152 +1,129 @@
 {
-  "Amaryllis": {
+  "Seraphina": {
     "enchantments": {
-      "Bane of Arthropods IV": 45,
-      "Aqua Affinity": 11,
-      "Smite I": 19,
-      "Smite V": 22,
+      "Bookshelf": 1,
+      "Looting I": 1,
+      "Unbreaking III": 1,
+      "Luck of the Sea III": 1
+    }
+  },
+  "Calista": {
+    "enchantments": {
+      "Bane of Arthropods IV": 18,
+      "Respiration III": 1,
+      "Channeling": 1,
       "Compass": 1
     }
   },
-  "Arabella": {
+  "Cassandra": {
     "enchantments": {
-      "Efficiency V": 17,
-      "Multishot": 1,
+      "Efficiency I": 1,
+      "Power V": 1,
+      "Sharpness V": 25,
+      "Density III": 13
+    }
+  },
+  "Liriel": {
+    "enchantments": {
+      "Looting III": 1,
+      "Lantern": 1,
+      "Riptide III": 8,
+      "Clock": 1
+    }
+  },
+  "Valeria": {
+    "enchantments": {
+      "Fire Protection I": 1,
+      "Loyalty III": 1,
       "Glass": 1,
       "Clock": 1
     }
   },
-  "Aurelia": {
+  "Lucinda": {
     "enchantments": {
-      "Bookshelf": 1,
-      "Mending": 11,
-      "Silk Touch": 1,
+      "Fire Aspect II": 1,
+      "Smite III": 18,
+      "Glass": 1,
+      "Bane of Arthropods IV": 16
+    }
+  },
+  "Edmund": {
+    "enchantments": {
+      "Fortune III": 1,
+      "Lantern": 1,
+      "Curse of Binding": 1,
+      "Clock": 1
+    }
+  },
+  "Laurence": {
+    "enchantments": {
+      "Breach IV": 1,
+      "Bane of Arthropods III": 17,
+      "Glass": 1,
       "Aqua Affinity": 1
     }
   },
-  "Belmont": {
-    "enchantments": {
-      "Channeling": 1,
-      "Lantern": 1,
-      "Glass": 1,
-      "Respiration I": 1
-    }
-  },
-  "Cedric": {
-    "enchantments": {
-      "Unbreaking III": 1,
-      "Riptide I": 1,
-      "Glass": 1,
-      "Clock": 1
-    }
-  },
-  "Elysia": {
-    "enchantments": {
-      "Depth Strider III": 1,
-      "Lantern": 1,
-      "Glass": 1,
-      "Clock": 1
-    }
-  },
-  "Evanthe": {
-    "enchantments": {
-      "Impaling III": 13,
-      "Frost Walker I": 26,
-      "Feather Falling IV": 58
-    }
-  },
-  "Isolde": {
-    "enchantments": {
-      "Fortune III": 5,
-      "Sharpness IV": 28,
-      "Glass": 1,
-      "Compass": 1
-    }
-  },
-  "Lucas": {
-    "enchantments": {
-      "Density IV": 1,
-      "Lantern": 1,
-      "Curse of Binding": 1,
-      "Compass": 1
-    }
-  },
-  "Magnus": {
-    "enchantments": {
-      "Mending": 1,
-      "Lantern": 1,
-      "Loyalty I": 1,
-      "Compass": 1
-    }
-  },
-  "Matthias": {
-    "enchantments": {
-      "Aqua Affinity": 1,
-      "Curse of Vanishing": 11,
-      "Glass": 1,
-      "Compass": 1
-    }
-  },
-  "Mirabel": {
-    "enchantments": {
-      "Bookshelf": 1,
-      "Smite II": 1,
-      "Protection IV": 22,
-      "Flame": 1
-    }
-  },
-  "Ophelia": {
+  "Oren": {
     "enchantments": {
       "Bookshelf": 1,
       "Lantern": 1,
+      "Glass": 1,
+      "Lunge III": 1
+    }
+  },
+  "Severin": {
+    "enchantments": {
       "Infinity": 1,
-      "Looting II": 1
+      "Density I": 1,
+      "Flame": 1,
+      "Blast Protection II": 1
     }
   },
-  "Osric": {
+  "Zorren": {
     "enchantments": {
-      "Fire Aspect II": 1,
-      "Lantern": 1,
-      "Glass": 1,
-      "Clock": 1
+      "Bookshelf": 1,
+      "Silk Touch": 1,
+      "Efficiency II": 4,
+      "Multishot": 1
     }
   },
-  "Selene": {
+  "Theodora": {
     "enchantments": {
-      "Multishot": 19,
-      "Lantern": 1,
-      "Impaling V": 19
-    }
-  },
-  "Thalassa": {
-    "enchantments": {
-      "Thorns III": 37,
-      "Lantern": 1,
-      "Frost Walker II": 30,
-      "Clock": 1
-    }
-  },
-  "Xander": {
-    "enchantments": {
-      "Fortune III": 1,
-      "Sharpness I": 1,
-      "Glass": 1,
+      "Sharpness V": 1,
+      "Curse of Binding": 1,
+      "Respiration I": 1,
       "Compass": 1
     }
   },
-  "Thaddeus": {
+  "Elowen": {
     "enchantments": {
-      "Curse of Vanishing": 1,
+      "Luck of the Sea": 1,
       "Lantern": 1,
-      "Clock": 1
+      "Piercing IV": 1,
+      "Depth Strider III": 1
     }
   },
-  "Florian": {
+  "Sylvanus": {
+    "enchantments": {
+      "Protection IV": 1,
+      "Lure III": 1,
+      "Fire Protection III": 1
+    }
+  },
+  "Winona": {
     "enchantments": {
       "Bookshelf": 1,
-      "Lantern": 1,
-      "Density V": 1,
-      "Clock": 1
+      "Fire Protection IV": 4,
+      "Mending": 1,
+      "Punch II": 1
+    }
+  },
+  "Maribel": {
+    "enchantments": {
+      "Bookshelf": 1,
+      "Aqua Affinity": 1,
+      "Channeling": 1,
+      "Knockback II": 1
     }
   }
 }
